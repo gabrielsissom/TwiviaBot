@@ -1,7 +1,7 @@
 from twitchio.ext import commands
 import os
 import random
-from asyncio import sleep
+import asyncio
 import json
 import requests
 
@@ -35,7 +35,8 @@ class Bot(commands.Bot):
             prefix=os.environ['BOT_PREFIX'],
             initial_channels=[os.environ['CHANNEL']]
         )
-
+        
+        # self.categories = ['fooddrink']
         self.categories = [
             'artliterature',
             'language',
@@ -53,6 +54,18 @@ class Bot(commands.Bot):
             'sportsleisure'
             ]
         self.current_question = None
+
+    async def check_answer(self, ctx):
+        try:
+            await asyncio.wait_for(self.wait_for_answer(ctx), timeout=30)
+        except asyncio.TimeoutError:
+            if self.current_question:  # If the question hasn't been answered yet
+                await ctx.send("Time's up! The correct answer was: " + self.current_question["answer"])
+                self.current_question = None
+
+    async def wait_for_answer(self, ctx):
+        while self.current_question is not None:
+            await asyncio.sleep(1)
 
     async def event_ready(self):
         print(f'Logged in as | {self.nick}')
@@ -92,11 +105,11 @@ class Bot(commands.Bot):
                 "question": question_data["question"],
                 "answer": question_data["answer"],
             }
-            print(f"Triva Game Started: Q: " + self.current_question["question"] + " A: " + self.current_question["answer"])
+            print(f"Triva Game Started [category: " + self.current_question['category'] + "]: Q: " + self.current_question["question"] + " A: " + self.current_question["answer"])
 
             if response.status_code == requests.codes.ok:
                 await ctx.send(f"Trivia question: " + self.current_question["question"])
-                await sleep(30)  # Users have 30 seconds to answer
+                await self.check_answer(ctx)
             else:
                 await ctx.send("Error:", response.status_code, response.text)
 
@@ -109,6 +122,11 @@ class Bot(commands.Bot):
     @commands.command()
     async def points(self, ctx: commands.Context):
         await ctx.send(f'The current points of {ctx.author.name} is ' + str(get_score(ctx.author.name)))
+    
+    @commands.command()
+    async def skip(self, ctx: commands.Context):
+        await ctx.send(f'Question skipped. A: ' + self.current_question["answer"])
+        self.current_question = None
 
 twiviaBot = Bot()
 twiviaBot.run()
