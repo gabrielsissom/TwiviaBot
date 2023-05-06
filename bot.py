@@ -8,7 +8,7 @@ from difflib import SequenceMatcher
 
 TIME_BEFORE_HINT = 20 # Seconds before a hint is given.
 TIME_BEFORE_ANSWER = 10 # Seconds (after hint is given) before the answer is revealed.
-ANSWER_CORRECTNESS = 0.8 # Scale between 0.0 and 1.0 where 1.0 is an exact match.
+ANSWER_CORRECTNESS = 0.9 # Scale between 0.0 and 1.0 where 1.0 is an exact match.
 
 def similarity(a, b):
     return SequenceMatcher(None, a, b).ratio()
@@ -102,7 +102,7 @@ class Bot(commands.Bot):
         if self.current_question and similarity(user_answer, correct_answer) >= ANSWER_CORRECTNESS:
             user = message.author.name
             add_score(user, 1)
-            await message.channel.send(f"{user} answered correctly! Their score is now {get_score(user)}.")
+            await message.channel.send(f"{user} answered correctly! Their score is now {get_score(user)}. Answer: {self.current_question['answer']}")
             self.current_question = None
 
         await self.handle_commands(message)
