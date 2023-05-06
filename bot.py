@@ -151,8 +151,14 @@ class Bot(commands.Bot):
     
     @commands.command()
     async def skip(self, ctx: commands.Context):
-        await ctx.send(f'Question skipped. A: ' + self.current_question["answer"])
-        self.current_question = None
+        if ctx.author.is_mod:
+            await ctx.send(f'Question skipped. A: ' + self.current_question["answer"])
+            self.current_question = None
+        elif ctx.author.name == 'itssport':
+            await ctx.send(f'Question skipped. A: ' + self.current_question["answer"])
+            self.current_question = None
+        else:
+            await ctx.send("You must be a moderator to use this command.")
 
 twiviaBot = Bot()
 twiviaBot.run()
