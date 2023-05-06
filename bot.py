@@ -4,6 +4,14 @@ import random
 import asyncio
 import json
 import requests
+from difflib import SequenceMatcher
+
+TIME_BEFORE_HINT = 20 # Seconds before a hint is given.
+TIME_BEFORE_ANSWER = 10 # Seconds (after hint is given) before the answer is revealed.
+ANSWER_CORRECTNESS = 0.8 # Scale between 0.0 and 1.0 where 1.0 is an exact match.
+
+def similarity(a, b):
+    return SequenceMatcher(None, a, b).ratio()
 
 def load_scores():
     with open("scores.json", "r") as file:
@@ -24,7 +32,6 @@ def add_score(username, points):
 def get_score(username):
     scores = load_scores()
     return scores.get(username, 0)
-
 
 class Bot(commands.Bot):
     def __init__(self):
@@ -57,12 +64,26 @@ class Bot(commands.Bot):
 
     async def check_answer(self, ctx):
         try:
-            await asyncio.wait_for(self.wait_for_answer(ctx), timeout=30)
+            await asyncio.wait_for(self.wait_for_answer(ctx), timeout=TIME_BEFORE_HINT)
+        except asyncio.TimeoutError:
+            if self.current_question:
+                revealed_chars = int(len(self.current_question["answer"]) / 5)
+                hint = ''
+                for i, char in enumerate(self.current_question["answer"]):
+                    if char == ' ':
+                        hint += ' '
+                    elif i < revealed_chars:
+                        hint += char
+                    else:
+                        hint += '_'
+                await ctx.send("Hint: " + hint)
+        try:
+            await asyncio.wait_for(self.wait_for_answer(ctx), timeout=TIME_BEFORE_ANSWER)
         except asyncio.TimeoutError:
             if self.current_question:  # If the question hasn't been answered yet
                 await ctx.send("Time's up! The correct answer was: " + self.current_question["answer"])
                 self.current_question = None
-
+    
     async def wait_for_answer(self, ctx):
         while self.current_question is not None:
             await asyncio.sleep(1)
@@ -75,10 +96,10 @@ class Bot(commands.Bot):
         if message.echo:
             return
 
-        print(message.author)
-        print(message.content)
+        user_answer = message.content.strip().lower()
+        correct_answer = self.current_question['answer'].lower() if self.current_question else None
 
-        if self.current_question and message.content.strip().lower() == self.current_question['answer'].lower():
+        if self.current_question and similarity(user_answer, correct_answer) >= ANSWER_CORRECTNESS:
             user = message.author.name
             add_score(user, 1)
             await message.channel.send(f"{user} answered correctly! Their score is now {get_score(user)}.")
