@@ -124,8 +124,13 @@ class Bot(commands.Bot):
             self.current_question = {
                 "category": question_data["category"],
                 "question": question_data["question"],
+                #"answer": "Answer (really unimportant)", #Debug: removing parenthesis
                 "answer": question_data["answer"],
             }
+
+            if "(" in self.current_question["answer"]:
+                self.current_question["answer"] = self.current_question["answer"][:self.current_question["answer"].index("(")]
+            
             print(f"Triva Game Started [category: " + self.current_question['category'] + "]: Q: " + self.current_question["question"] + " A: " + self.current_question["answer"])
 
             if response.status_code == requests.codes.ok:
