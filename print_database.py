@@ -1,26 +1,20 @@
 import sqlite3
 
-# Open a connection to the database
-conn = sqlite3.connect('channel_data.db')
+def print_table(table_name):
+    conn = sqlite3.connect('channel_data.db')
+    c = conn.cursor()
+    c.execute(f'SELECT * FROM {table_name}')
+    rows = c.fetchall()
+    conn.close()
 
-# Create a cursor object
-c = conn.cursor()
+    print(f"\n{table_name}:")
+    for row in rows:
+        print(row)
 
-# Execute a SELECT statement on the channels table and print the results
-c.execute('SELECT * FROM channels')
-channels = c.fetchall()
-print('Channels:')
-for channel in channels:
-    print(channel)
+def main():
+    print_table("channels")
+    print_table("users")
+    print_table("channel_cooldowns")
 
-# Execute a SELECT statement on the users table and print the results
-c.execute('SELECT * FROM users')
-users = c.fetchall()
-print('\nUsers:')
-print("Username | Channel | Score")
-for user in users:
-    print(user)
-
-# Close the cursor and the connection
-c.close()
-conn.close()
+if __name__ == "__main__":
+    main()

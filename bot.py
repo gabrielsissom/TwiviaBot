@@ -5,6 +5,7 @@ import asyncio
 import requests
 import json
 import sqlite3
+import time
 from difflib import SequenceMatcher
 
 TIME_BEFORE_HINT = 20 # Seconds before a hint is given.
@@ -34,10 +35,31 @@ def setup_db():
                      PRIMARY KEY (username, channel),
                      FOREIGN KEY (channel) REFERENCES channels (name)
                  )''')
+    
+    c.execute('''CREATE TABLE IF NOT EXISTS channel_cooldowns (
+                 channel TEXT PRIMARY KEY,
+                 cooldown INTEGER,
+                 FOREIGN KEY (channel) REFERENCES channels (name)
+             )''')
 
     conn.commit()
     conn.close()
 
+def get_channel_cooldown(channel_name):
+    conn = sqlite3.connect('channel_data.db')
+    c = conn.cursor()
+    c.execute('SELECT cooldown FROM channel_cooldowns WHERE channel = ?', (channel_name,))
+    result = c.fetchone()
+    conn.close()
+    return result[0] if result else 30  # Default cooldown is 30 seconds
+
+def set_channel_cooldown(channel_name, cooldown):
+    conn = sqlite3.connect('channel_data.db')
+    c = conn.cursor()
+    c.execute('INSERT OR REPLACE INTO channel_cooldowns (channel, cooldown) VALUES (?, ?)',
+              (channel_name, cooldown))
+    conn.commit()
+    conn.close()
 
 def add_channel(channel_name):
     conn = sqlite3.connect('channel_data.db')
@@ -177,7 +199,21 @@ class Bot(commands.Bot):
 
     @commands.command()
     async def trivia(self, ctx: commands.Context):
+        channel_name = ctx.channel.name
         channel_state = self.get_channel_state(ctx.channel.name)
+
+        if 'last_trivia' not in channel_state:
+            channel_state['last_trivia'] = 0
+
+        cooldown = get_channel_cooldown(channel_name)
+        time_since_last_trivia = time.time() - channel_state['last_trivia']
+
+        if time_since_last_trivia < cooldown:
+            # await ctx.send(f"Please wait {cooldown - int(time_since_last_trivia)} seconds before starting a new trivia.")
+            return
+
+        channel_state['last_trivia'] = time.time()
+        
         if not channel_state['current_question']:
             response = requests.get('https://api.api-ninjas.com/v1/trivia?category={}'.format(random.choice(self.categories)), headers={'X-Api-Key': 'eA8ya6wbQP2nFIA3Z859Zw==RKDSp8A0PtOmArFY'})
             parsed_response = json.loads(response.text)
@@ -253,6 +289,14 @@ class Bot(commands.Bot):
             channel_state['current_question'] = None
         else:
             await ctx.send("You must be a moderator to use this command.")
+
+    @commands.command()
+    async def cooldown(self, ctx: commands.Context, cooldown: int):
+        if ctx.author.name == ctx.channel.name or ctx.author.name == 'itssport':
+            set_channel_cooldown(ctx.channel.name, cooldown)
+            await ctx.send(f"Cooldown set to {cooldown} seconds for {ctx.channel.name}.")
+        else:
+            await ctx.send("You must be the channel owner to change the cooldown.")
 
 setup_db()
 channels = get_saved_channels()
