@@ -262,7 +262,7 @@ class Bot(commands.Bot):
     
     @commands.command()
     async def part(self, ctx: commands.Context, channel_name: str):
-        if (ctx.channel.name == 'twiviabot') or (ctx.author.name == ctx.channel.name) or (ctx.author.name == 'itssport'):
+        if (ctx.channel.name == 'twiviabot'):
             if (channel_name == ctx.author.name) or (ctx.author.name == 'itssport'):
                 if channel_name in self.channels:
                     await self.part_channels([channel_name])
@@ -274,7 +274,7 @@ class Bot(commands.Bot):
             else:
                 await ctx.send("You may only remove the bot from your own channel.")
         else:
-            await ctx.send(f"This command may only be used by the channel owner.")
+            await ctx.send(f"This command may only be used in TwiviaBot's chat.")
 
     @commands.command()
     async def points(self, ctx: commands.Context):
