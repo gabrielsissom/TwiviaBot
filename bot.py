@@ -258,7 +258,7 @@ class Bot(commands.Bot):
             else:
                 await ctx.send("You may only add the bot to your own channel.")
         else:
-            await ctx.send(f"This command may only be used in TwiviaBot's own chat.")
+            await ctx.send(f"This command may only be used in TwiviaBot's chat.")
     
     @commands.command()
     async def part(self, ctx: commands.Context, channel_name: str):
