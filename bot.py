@@ -10,7 +10,7 @@ from difflib import SequenceMatcher
 
 TIME_BEFORE_HINT = 20 # Seconds before a hint is given.
 TIME_BEFORE_ANSWER = 10 # Seconds (after hint is given) before the answer is revealed.
-ANSWER_CORRECTNESS = 0.9 # Scale between 0.0 and 1.0 where 1.0 is an exact match.
+ANSWER_CORRECTNESS = 0.8 # Scale between 0.0 and 1.0 where 1.0 is an exact match.
 
 def get_saved_channels():
     conn = sqlite3.connect('channel_data.db')
@@ -151,17 +151,24 @@ class Bot(commands.Bot):
             await asyncio.wait_for(self.wait_for_answer(ctx), timeout=TIME_BEFORE_HINT)
         except asyncio.TimeoutError:
             if channel_state['current_question']:
-                revealed_chars = int(len(channel_state['current_question']["answer"]) / 5) + 1
+                answer = channel_state['current_question']["answer"]
+                revealed_chars = int(len(answer) * 0.25) + 1
+
+                # Select random indices to reveal
+                indices_to_reveal = random.sample(range(len(answer)), revealed_chars)
+
                 hint = ''
-                for i, char in enumerate(channel_state['current_question']["answer"]):
+                for i, char in enumerate(answer):
                     if char == ' ':
-                        hint += ' '
-                    elif i < revealed_chars:
+                        hint += '/'
+                    elif i in indices_to_reveal:
                         hint += char
                     else:
                         hint += '_'
-                print(f"[{ctx.channel.name}] Hint generated: {hint}")
-                await ctx.send("Hint: " + hint)
+                    hint += ' '  # Add space between each character
+
+                print(f"[{ctx.channel.name}] Hint generated: {hint.strip()}")
+                await ctx.send("Hint: " + hint.strip())
         try:
             await asyncio.wait_for(self.wait_for_answer(ctx), timeout=TIME_BEFORE_ANSWER)
         except asyncio.TimeoutError:
