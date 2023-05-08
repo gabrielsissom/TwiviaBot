@@ -152,7 +152,7 @@ class Bot(commands.Bot):
         except asyncio.TimeoutError:
             if channel_state['current_question']:
                 answer = channel_state['current_question']["answer"]
-                revealed_chars = int(len(answer) * 0.25) + 1
+                revealed_chars = int(len(answer) * 0.4) + 1
 
                 # Select random indices to reveal
                 indices_to_reveal = random.sample(range(len(answer)), revealed_chars)
@@ -198,7 +198,7 @@ class Bot(commands.Bot):
             channel = message.channel.name
             add_score(channel, user, 1)
             print(f"{user} answered with {similarity(user_answer, correct_answer)} accuracy.")
-            await message.channel.send(f"{user} answered with {str(similarity(user_answer, correct_answer) * 100):.0f}! Their score is now {get_score(channel, user)}. Answer: {channel_state['current_question']['answer']}")
+            await message.channel.send(f"{user} answered with {str(similarity(user_answer, correct_answer) * 100)}% accuracy! Their score is now {get_score(channel, user)}. Answer: {channel_state['current_question']['answer']}")
             channel_state['current_question'] = None
 
         await self.handle_commands(message)
@@ -302,7 +302,7 @@ class Bot(commands.Bot):
     async def cooldown(self, ctx: commands.Context, cooldown: int = None):
         channel_state = self.get_channel_state(ctx.channel.name)
 
-        if ctx.author.name == ctx.channel.name or ctx.author.name == 'itssport':
+        if (ctx.author.is_mod) or (ctx.author.name == 'itssport'):
             if cooldown is not None:
                 set_channel_cooldown(ctx.channel.name, cooldown)
                 await ctx.send(f"Cooldown set to {cooldown} seconds for {ctx.channel.name}.")
