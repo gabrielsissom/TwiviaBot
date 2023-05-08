@@ -10,7 +10,7 @@ from difflib import SequenceMatcher
 
 TIME_BEFORE_HINT = 20 # Seconds before a hint is given.
 TIME_BEFORE_ANSWER = 10 # Seconds (after hint is given) before the answer is revealed.
-ANSWER_CORRECTNESS = 0.8 # Scale between 0.0 and 1.0 where 1.0 is an exact match.
+ANSWER_CORRECTNESS = 0.9 # Scale between 0.0 and 1.0 where 1.0 is an exact match.
 
 def get_saved_channels():
     conn = sqlite3.connect('channel_data.db')
