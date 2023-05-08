@@ -294,19 +294,28 @@ class Bot(commands.Bot):
     async def cooldown(self, ctx: commands.Context, cooldown: int = None):
         channel_state = self.get_channel_state(ctx.channel.name)
 
-        if 'last_trivia' not in channel_state:
-            channel_state['last_trivia'] = 0
-
         if ctx.author.name == ctx.channel.name or ctx.author.name == 'itssport':
             if cooldown is not None:
                 set_channel_cooldown(ctx.channel.name, cooldown)
                 await ctx.send(f"Cooldown set to {cooldown} seconds for {ctx.channel.name}.")
             else:
+                channel_name = ctx.channel.name
+
+                if 'last_trivia' not in channel_state:
+                    channel_state['last_trivia'] = 0
+                
+                cooldown = get_channel_cooldown(channel_name)
                 time_since_last_trivia = time.time() - channel_state['last_trivia']
-                await ctx.send(f"{ctx.channel.name}'s current cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)} remaining]")
+                await ctx.send(f"{ctx.channel.name}'s current cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)}s remaining]")
         else:
+            channel_name = ctx.channel.name
+
+            if 'last_trivia' not in channel_state:
+                channel_state['last_trivia'] = 0
+            
+            cooldown = get_channel_cooldown(channel_name)
             time_since_last_trivia = time.time() - channel_state['last_trivia']
-            await ctx.send(f"{ctx.channel.name}'s current cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)} remaining]")
+            await ctx.send(f"{ctx.channel.name}'s current cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)}s remaining]")
 
     @commands.command()
     async def help(self, ctx: commands.Context):
