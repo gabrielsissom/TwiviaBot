@@ -293,6 +293,10 @@ class Bot(commands.Bot):
     @commands.command()
     async def cooldown(self, ctx: commands.Context, cooldown: int = None):
         channel_state = self.get_channel_state(ctx.channel.name)
+
+        if 'last_trivia' not in channel_state:
+            channel_state['last_trivia'] = 0
+
         if ctx.author.name == ctx.channel.name or ctx.author.name == 'itssport':
             if cooldown is not None:
                 set_channel_cooldown(ctx.channel.name, cooldown)
