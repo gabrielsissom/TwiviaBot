@@ -102,6 +102,7 @@ class Bot(commands.Bot):
         if self.current_question and similarity(user_answer, correct_answer) >= ANSWER_CORRECTNESS:
             user = message.author.name
             add_score(user, 1)
+            print(f"{user} answered with {similarity(user_answer, correct_answer)} accuracy.")
             await message.channel.send(f"{user} answered correctly! Their score is now {get_score(user)}. Answer: {self.current_question['answer']}")
             self.current_question = None
 
@@ -128,7 +129,9 @@ class Bot(commands.Bot):
                 "answer": question_data["answer"],
             }
 
+            #Remove parentheses
             if "(" in self.current_question["answer"]:
+                print(f"Removing Parentheses From: {self.current_question['answer']}")
                 self.current_question["answer"] = self.current_question["answer"][:self.current_question["answer"].index("(")]
             
             print(f"Triva Game Started [category: " + self.current_question['category'] + "]: Q: " + self.current_question["question"] + " A: " + self.current_question["answer"])
