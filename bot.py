@@ -229,7 +229,7 @@ class Bot(commands.Bot):
                 print(f"Removing Parentheses From: {channel_state['current_question']['answer']}")
                 channel_state['current_question']["answer"] = channel_state['current_question']["answer"][:channel_state['current_question']["answer"].index("(")]
 
-            print(f"[{ctx.channel.name}] Triva Game Started [category: " + channel_state['current_question']['category'] + "]: Q: " + channel_state['current_question']["question"] + " A: " + channel_state['current_question']["answer"])
+            print(f"[{ctx.channel.name}] Triva Game Started by {ctx.author.name} [category: " + channel_state['current_question']['category'] + "]: Q: " + channel_state['current_question']["question"] + " A: " + channel_state['current_question']["answer"])
 
             if response.status_code == requests.codes.ok:
                 await ctx.send(f"Trivia question: " + channel_state['current_question']["question"])
