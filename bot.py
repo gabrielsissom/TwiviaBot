@@ -298,6 +298,16 @@ class Bot(commands.Bot):
         else:
             await ctx.send("You must be the channel owner to change the cooldown.")
 
+    @commands.command()
+    async def help(self, ctx: commands.Context):
+        await ctx.send(
+            "COMMANDS: " +
+            "%trivia - Start a new trivia game | " +
+            "%points - See how many points you have | " +
+            "%skip - Skip the current question (mod only) | " +
+            "%cooldown [seconds] - Set a cooldown for trivia (streamer only) "
+        )
+
 setup_db()
 channels = get_saved_channels()
 if 'itssport' not in channels:
