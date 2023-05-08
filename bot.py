@@ -306,7 +306,7 @@ class Bot(commands.Bot):
                 
                 cooldown = get_channel_cooldown(channel_name)
                 time_since_last_trivia = time.time() - channel_state['last_trivia']
-                await ctx.send(f"{ctx.channel.name}'s current cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)}s remaining]")
+                await ctx.send(f"{ctx.channel.name}'s trivia cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)}s remaining]")
         else:
             channel_name = ctx.channel.name
 
@@ -315,7 +315,7 @@ class Bot(commands.Bot):
             
             cooldown = get_channel_cooldown(channel_name)
             time_since_last_trivia = time.time() - channel_state['last_trivia']
-            await ctx.send(f"{ctx.channel.name}'s current cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)}s remaining]")
+            await ctx.send(f"{ctx.channel.name}'s triva cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)}s remaining]")
 
     @commands.command()
     async def help(self, ctx: commands.Context):
