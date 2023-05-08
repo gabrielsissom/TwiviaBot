@@ -291,12 +291,16 @@ class Bot(commands.Bot):
             await ctx.send("You must be a moderator to use this command.")
 
     @commands.command()
-    async def cooldown(self, ctx: commands.Context, cooldown: int):
+    async def cooldown(self, ctx: commands.Context, cooldown: int = None):
         if ctx.author.name == ctx.channel.name or ctx.author.name == 'itssport':
-            set_channel_cooldown(ctx.channel.name, cooldown)
-            await ctx.send(f"Cooldown set to {cooldown} seconds for {ctx.channel.name}.")
+            if cooldown is not None:
+                set_channel_cooldown(ctx.channel.name, cooldown)
+                await ctx.send(f"Cooldown set to {cooldown} seconds for {ctx.channel.name}.")
+            else:
+                await ctx.send(f"{ctx.channel.name}'s current cooldown is {get_channel_cooldown(ctx.channel.name)} seconds.")
         else:
-            await ctx.send("You must be the channel owner to change the cooldown.")
+            await ctx.send(f"{ctx.channel.name}'s current cooldown is {get_channel_cooldown(ctx.channel.name)} seconds.")
+
 
     @commands.command()
     async def help(self, ctx: commands.Context):
