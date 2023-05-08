@@ -229,7 +229,7 @@ class Bot(commands.Bot):
                 print(f"Removing Parentheses From: {channel_state['current_question']['answer']}")
                 channel_state['current_question']["answer"] = channel_state['current_question']["answer"][:channel_state['current_question']["answer"].index("(")]
 
-            print(f"[{ctx.channel.name}] Triva Game Started by {ctx.author.name} [category: " + channel_state['current_question']['category'] + "]: Q: " + channel_state['current_question']["question"] + " A: " + channel_state['current_question']["answer"])
+            print(f"[{ctx.channel.name}] Trivia Game Started by {ctx.author.name} [category: " + channel_state['current_question']['category'] + "]: Q: " + channel_state['current_question']["question"] + " A: " + channel_state['current_question']["answer"])
 
             if response.status_code == requests.codes.ok:
                 await ctx.send(f"Trivia question: " + channel_state['current_question']["question"])
@@ -315,7 +315,7 @@ class Bot(commands.Bot):
             
             cooldown = get_channel_cooldown(channel_name)
             time_since_last_trivia = time.time() - channel_state['last_trivia']
-            await ctx.send(f"{ctx.channel.name}'s triva cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)}s remaining]")
+            await ctx.send(f"{ctx.channel.name}'s trivia cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)}s remaining]")
 
     @commands.command()
     async def help(self, ctx: commands.Context):
