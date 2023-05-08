@@ -208,30 +208,35 @@ class Bot(commands.Bot):
 
     @commands.command()
     async def join(self, ctx: commands.Context, channel_name: str):
-        if (channel_name == ctx.author.name) or (ctx.author.name == 'itssport'):
-            if channel_name not in self.channels:
-                await self.join_channels([channel_name])
-                self.channels.append(channel_name)
-                add_channel(channel_name)
-                await ctx.send(f"Joined channel {channel_name}")
+        if ctx.channel.name == 'twiviabot':
+            if (channel_name == ctx.author.name) or (ctx.author.name == 'itssport'):
+                if channel_name not in self.channels:
+                    await self.join_channels([channel_name])
+                    self.channels.append(channel_name)
+                    add_channel(channel_name)
+                    await ctx.send(f"Joined channel {channel_name}")
+                else:
+                    await ctx.send(f"Already in channel {channel_name}")
             else:
-                await ctx.send(f"Already in channel {channel_name}")
+                await ctx.send("You may only add the bot to your own channel.")
         else:
-            await ctx.send("You may only add the bot to your own channel.")
-
+            await ctx.send(f"This command may only be used in TwiviaBot's own chat.")
+    
     @commands.command()
     async def part(self, ctx: commands.Context, channel_name: str):
-        if (channel_name == ctx.author.name) or (ctx.author.name == 'itssport'):
-            if channel_name in self.channels:
-                await self.part_channels([channel_name])
-                self.channels.remove(channel_name)
-                remove_channel(channel_name)
-                await ctx.send(f"Left channel {channel_name}")
+        if (ctx.channel.name == 'twiviabot') or (ctx.author.name == ctx.channel.name) or (ctx.author.name == 'itssport'):
+            if (channel_name == ctx.author.name) or (ctx.author.name == 'itssport'):
+                if channel_name in self.channels:
+                    await self.part_channels([channel_name])
+                    self.channels.remove(channel_name)
+                    remove_channel(channel_name)
+                    await ctx.send(f"Left channel {channel_name}")
+                else:
+                    await ctx.send(f"Channel {channel_name} not found in the list.")
             else:
-                await ctx.send(f"Channel {channel_name} not found in the list.")
+                await ctx.send("You may only remove the bot from your own channel.")
         else:
-            await ctx.send("You may only remove the bot from your own channel.")
-
+            await ctx.send(f"This command may only be used by the channel owner.")
 
     @commands.command()
     async def points(self, ctx: commands.Context):
