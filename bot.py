@@ -316,10 +316,6 @@ class Bot(commands.Bot):
 
 setup_db()
 channels = get_saved_channels()
-if 'itssport' not in channels:
-    add_channel('itssport')
-    channels = get_saved_channels()
-    print(f"itssport not found in channels list on boot, re-added.")
 if 'twiviabot' not in channels:
     add_channel('twiviabot')
     channels = get_saved_channels()
