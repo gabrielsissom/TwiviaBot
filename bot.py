@@ -198,7 +198,7 @@ class Bot(commands.Bot):
             channel = message.channel.name
             add_score(channel, user, 1)
             print(f"{user} answered with {similarity(user_answer, correct_answer)} accuracy.")
-            await message.channel.send(f"{user} answered with {str(similarity(user_, correct_answer) * 100):.0f}! Their score is now {get_score(channel, user)}. Answer: {channel_state['current_question']['answer']}")
+            await message.channel.send(f"{user} answered with {str(similarity(user_answer, correct_answer) * 100):.0f}! Their score is now {get_score(channel, user)}. Answer: {channel_state['current_question']['answer']}")
             channel_state['current_question'] = None
 
         await self.handle_commands(message)
