@@ -252,7 +252,7 @@ class Bot(commands.Bot):
                     await self.join_channels([channel_name])
                     self.channels.append(channel_name)
                     add_channel(channel_name)
-                    await ctx.send(f"Joined channel {channel_name}")
+                    await ctx.send(f"Twivia bot has joined channel {channel_name}. Make sure to /mod TwiviaBot.")
                 else:
                     await ctx.send(f"Already in channel {channel_name}")
             else:
@@ -268,7 +268,7 @@ class Bot(commands.Bot):
                     await self.part_channels([channel_name])
                     self.channels.remove(channel_name)
                     remove_channel(channel_name)
-                    await ctx.send(f"Left channel {channel_name}")
+                    await ctx.send(f"TwiviaBot has left channel {channel_name}.")
                 else:
                     await ctx.send(f"Channel {channel_name} not found in the list.")
             else:
