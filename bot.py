@@ -45,6 +45,14 @@ def setup_db():
     conn.commit()
     conn.close()
 
+def get_top_users(channel_name, limit=5):
+    conn = sqlite3.connect('channel_data.db')
+    c = conn.cursor()
+    c.execute('SELECT username, score FROM users WHERE channel = ? ORDER BY score DESC LIMIT ?', (channel_name, limit))
+    result = c.fetchall()
+    conn.close()
+    return result
+
 def get_channel_cooldown(channel_name):
     conn = sqlite3.connect('channel_data.db')
     c = conn.cursor()
@@ -293,6 +301,14 @@ class Bot(commands.Bot):
         await ctx.send(f'The current points of {ctx.author.name} is ' + str(get_score(ctx.channel.name, ctx.author.name)))
     
     @commands.command()
+    async def leaderboard(self, ctx: commands.Context):
+        top_users = get_top_users(ctx.channel.name)
+        leaderboard_message = "Leaderboard:\n"
+        for idx, user in enumerate(top_users, start=1):
+            leaderboard_message += f"{idx}. {user[0]} - {user[1]} points\n"
+        await ctx.send(leaderboard_message)
+
+    @commands.command()
     async def skip(self, ctx: commands.Context):
         channel_state = self.get_channel_state(ctx.channel.name)
         if ctx.author.is_mod or ctx.author.name == 'itssport':
@@ -333,10 +349,11 @@ class Bot(commands.Bot):
     async def help(self, ctx: commands.Context):
         await ctx.send(
             "COMMANDS: " +
+            "%join / %part - Add or remove bot from your channel" +
             "%trivia - Start a new trivia game | " +
             "%points - See how many points you have | " +
             "%skip - Skip the current question (mod only) | " +
-            "%cooldown [seconds] - Set a cooldown for trivia (streamer only) "
+            "%cooldown [seconds] - Set a cooldown for trivia (mod only) "
         )
 
 setup_db()
