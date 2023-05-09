@@ -214,53 +214,49 @@ class Bot(commands.Bot):
     @commands.command()
     async def trivia(self, ctx: commands.Context):
         channel_name = ctx.channel.name
-        try:
-            channel_state = self.get_channel_state(ctx.channel.name)
-            if 'last_trivia' not in channel_state:
-                channel_state['last_trivia'] = 0
+        channel_state = self.get_channel_state(ctx.channel.name)
+        if 'last_trivia' not in channel_state:
+            channel_state['last_trivia'] = 0
 
-            cooldown = get_channel_cooldown(channel_name)
-            time_since_last_trivia = time.time() - channel_state['last_trivia']
+        cooldown = get_channel_cooldown(channel_name)
+        time_since_last_trivia = time.time() - channel_state['last_trivia']
 
-            if time_since_last_trivia < cooldown:
-                await ctx.send(f"Please wait {cooldown - int(time_since_last_trivia)} seconds before starting a new trivia.")
-                return
+        if time_since_last_trivia < cooldown:
+            await ctx.send(f"Please wait {cooldown - int(time_since_last_trivia)} seconds before starting a new trivia.")
+            return
 
-            channel_state['last_trivia'] = time.time()
-            
-            if not channel_state['current_question']:
-                response = requests.get('https://api.api-ninjas.com/v1/trivia?category={}'.format(random.choice(self.categories)), headers={'X-Api-Key': 'eA8ya6wbQP2nFIA3Z859Zw==RKDSp8A0PtOmArFY'})
-                parsed_response = json.loads(response.text)
-                question_data = parsed_response[0]
-                channel_state['current_question'] = {
-                    "category": question_data["category"],
-                    "question": question_data["question"],
-                    #"answer": "Answer (really unimportant)", #Debug: removing parenthesis
-                    "answer": question_data["answer"],
-                }
+        channel_state['last_trivia'] = time.time()
+        
+        if not channel_state['current_question']:
+            response = requests.get('https://api.api-ninjas.com/v1/trivia?category={}'.format(random.choice(self.categories)), headers={'X-Api-Key': 'eA8ya6wbQP2nFIA3Z859Zw==RKDSp8A0PtOmArFY'})
+            parsed_response = json.loads(response.text)
+            question_data = parsed_response[0]
+            channel_state['current_question'] = {
+                "category": question_data["category"],
+                "question": question_data["question"],
+                #"answer": "Answer (really unimportant)", #Debug: removing parenthesis
+                "answer": question_data["answer"],
+            }
 
-                if "(" in channel_state['current_question']["answer"]:
-                    print(f"Removing Parentheses From: {channel_state['current_question']['answer']}")
-                    channel_state['current_question']["answer"] = channel_state['current_question']["answer"][:channel_state['current_question']["answer"].index("(")]
+            if "(" in channel_state['current_question']["answer"]:
+                print(f"Removing Parentheses From: {channel_state['current_question']['answer']}")
+                channel_state['current_question']["answer"] = channel_state['current_question']["answer"][:channel_state['current_question']["answer"].index("(")]
 
-                print(f"[{ctx.channel.name}] Trivia Game Started by {ctx.author.name} [category: " + channel_state['current_question']['category'] + "]: Q: " + channel_state['current_question']["question"] + " A: " + channel_state['current_question']["answer"])
+            print(f"[{ctx.channel.name}] Trivia Game Started by {ctx.author.name} [category: " + channel_state['current_question']['category'] + "]: Q: " + channel_state['current_question']["question"] + " A: " + channel_state['current_question']["answer"])
 
-                if response.status_code == requests.codes.ok:
-                    await ctx.send(f"Trivia question: " + channel_state['current_question']["question"])
-                    await self.check_answer(ctx)
-                else:
-                    await ctx.send("Error:", response.status_code, response.text)
-
-                if channel_state['current_question']:  # If the question hasn't been answered yet
-                    await ctx.send("Time's up! The correct answer was: " + channel_state['current_question']["answer"])
-                    print(f"[{ctx.channel.name}] Time Up | A: {channel_state['current_question']['answer']}")
-                    channel_state['current_question'] = None
+            if response.status_code == requests.codes.ok:
+                await ctx.send(f"Trivia question: " + channel_state['current_question']["question"])
+                await self.check_answer(ctx)
             else:
-                await ctx.send("A trivia question is already active!")
-        except Exception as e:
-            print(f"[{channel_name}] An error occurred during the trivia game: {e}")
-        finally:
-            self.clean_up_channel_state(channel_name)
+                await ctx.send("Error:", response.status_code, response.text)
+
+            if channel_state['current_question']:  # If the question hasn't been answered yet
+                await ctx.send("Time's up! The correct answer was: " + channel_state['current_question']["answer"])
+                print(f"[{ctx.channel.name}] Time Up | A: {channel_state['current_question']['answer']}")
+                channel_state['current_question'] = None
+        else:
+            await ctx.send("A trivia question is already active!")
+        self.clean_up_channel_state(channel_name)
         
     @commands.command()
     async def join(self, ctx: commands.Context, channel_name: str = None):
