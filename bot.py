@@ -220,7 +220,7 @@ class Bot(commands.Bot):
 
         cooldown = get_channel_cooldown(channel_name)
         time_since_last_trivia = time.time() - channel_state['last_trivia']
-        print(time_since_last_trivia)
+        # print(time_since_last_trivia) #Debug
 
         if time_since_last_trivia < cooldown:
             await ctx.send(f"Please wait {cooldown - int(time_since_last_trivia)} seconds before starting a new trivia.")
