@@ -149,7 +149,7 @@ class Bot(commands.Bot):
             }
         return self.channel_states[channel_name]
     
-    async def clean_up_channel_state(self, channel_name):
+    def clean_up_channel_state(self, channel_name):
         if channel_name in self.channel_states:
             del self.channel_states[channel_name]
 
@@ -260,7 +260,7 @@ class Bot(commands.Bot):
         except Exception as e:
             print(f"[{channel_name}] An error occurred during the trivia game: {e}")
         finally:
-            clean_up_channel_state(channel_name)
+            self.clean_up_channel_state(channel_name)
         
     @commands.command()
     async def join(self, ctx: commands.Context, channel_name: str = None):
