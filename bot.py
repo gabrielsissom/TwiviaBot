@@ -251,7 +251,9 @@ class Bot(commands.Bot):
             await ctx.send("A trivia question is already active!")
 
     @commands.command()
-    async def join(self, ctx: commands.Context, channel_name: str):
+    async def join(self, ctx: commands.Context, channel_name: str = None):
+        if channel_name == None:
+            channel_name = ctx.author.name
         if ctx.channel.name == 'twiviabot':
             if (channel_name == ctx.author.name) or (ctx.author.name == 'itssport'):
                 if channel_name not in self.channels:
@@ -268,7 +270,9 @@ class Bot(commands.Bot):
             await ctx.send(f"This command may only be used in TwiviaBot's chat.")
     
     @commands.command()
-    async def part(self, ctx: commands.Context, channel_name: str):
+    async def part(self, ctx: commands.Context, channel_name: str = None):
+        if channel_name == None:
+            channel_name = ctx.author.name
         if (ctx.channel.name == 'twiviabot'):
             if (channel_name == ctx.author.name) or (ctx.author.name == 'itssport'):
                 if channel_name in self.channels:
