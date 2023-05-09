@@ -352,6 +352,7 @@ class Bot(commands.Bot):
             "%join / %part - Add or remove bot from your channel | " +
             "%trivia - Start a new trivia game | " +
             "%points - See how many points you have | " +
+            "%leaderboard - Show top 5 users in this channel | " +
             "%skip - Skip the current question (mod only) | " +
             "%cooldown [seconds] - Set a cooldown for trivia (mod only) "
         )
