@@ -303,9 +303,9 @@ class Bot(commands.Bot):
     @commands.command()
     async def leaderboard(self, ctx: commands.Context):
         top_users = get_top_users(ctx.channel.name)
-        leaderboard_message = "Leaderboard:\n"
+        leaderboard_message = f"{ctx.channel.name}'s Trivia Leaderboard: \n"
         for idx, user in enumerate(top_users, start=1):
-            leaderboard_message += f"{idx}. {user[0]} - {user[1]} points\n"
+            leaderboard_message += f"{idx}. {user[0]} - {user[1]} points | \n"
         await ctx.send(leaderboard_message)
 
     @commands.command()
@@ -349,7 +349,7 @@ class Bot(commands.Bot):
     async def help(self, ctx: commands.Context):
         await ctx.send(
             "COMMANDS: " +
-            "%join / %part - Add or remove bot from your channel" +
+            "%join / %part - Add or remove bot from your channel | " +
             "%trivia - Start a new trivia game | " +
             "%points - See how many points you have | " +
             "%skip - Skip the current question (mod only) | " +
