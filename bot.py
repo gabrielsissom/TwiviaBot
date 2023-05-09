@@ -149,7 +149,7 @@ class Bot(commands.Bot):
             }
         return self.channel_states[channel_name]
     
-    def clean_up_channel_state(self, channel_name):
+    async def clean_up_channel_state(self, channel_name):
         if channel_name in self.channel_states:
             del self.channel_states[channel_name]
 
@@ -213,10 +213,9 @@ class Bot(commands.Bot):
 
     @commands.command()
     async def trivia(self, ctx: commands.Context):
+        channel_name = ctx.channel.name
         try:
-            channel_name = ctx.channel.name
             channel_state = self.get_channel_state(ctx.channel.name)
-
             if 'last_trivia' not in channel_state:
                 channel_state['last_trivia'] = 0
 
