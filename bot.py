@@ -220,6 +220,7 @@ class Bot(commands.Bot):
 
         cooldown = get_channel_cooldown(channel_name)
         time_since_last_trivia = time.time() - channel_state['last_trivia']
+        print(time_since_last_trivia)
 
         if time_since_last_trivia < cooldown:
             await ctx.send(f"Please wait {cooldown - int(time_since_last_trivia)} seconds before starting a new trivia.")
@@ -256,7 +257,6 @@ class Bot(commands.Bot):
                 channel_state['current_question'] = None
         else:
             await ctx.send("A trivia question is already active!")
-        self.clean_up_channel_state(channel_name)
         
     @commands.command()
     async def join(self, ctx: commands.Context, channel_name: str = None):
