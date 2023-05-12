@@ -3,6 +3,7 @@ import os
 import random
 import asyncio
 import requests
+import html
 import json
 import sqlite3
 import time
@@ -142,6 +143,25 @@ class Bot(commands.Bot):
         self.current_question = None
         self.channels = channels
 
+    def get_question(self):
+        api_url = 'https://opentdb.com/api.php?amount=1&type=multiple'
+        response = requests.get(api_url)
+        
+        if response.status_code == requests.codes.ok:
+            parsed_response = json.loads(response.text)
+            question_data = parsed_response["results"]
+            return question_data
+        else:
+            print("Error:", response.status_code, response.text)
+            return 
+    
+    def format_question(self, question):
+        formatted_question = html.unescape(question['question'])
+        formatted_answer = html.unescape(question['correct_answer'])
+        question['question'] = formatted_question
+        question['correct_answer'] = formatted_answer
+        return question
+
     def get_channel_state(self, channel_name):
         if channel_name not in self.channel_states:
             self.channel_states[channel_name] = {
@@ -214,7 +234,7 @@ class Bot(commands.Bot):
     @commands.command()
     async def trivia(self, ctx: commands.Context):
         channel_name = ctx.channel.name
-        channel_state = self.get_channel_state(ctx.channel.name)
+        channel_state = self.get_channel_state(channel_name)
         if 'last_trivia' not in channel_state:
             channel_state['last_trivia'] = 0
 
@@ -229,14 +249,23 @@ class Bot(commands.Bot):
         channel_state['last_trivia'] = time.time()
         
         if not channel_state['current_question']:
-            response = requests.get('https://api.api-ninjas.com/v1/trivia?category={}'.format(random.choice(self.categories)), headers={'X-Api-Key': 'eA8ya6wbQP2nFIA3Z859Zw==RKDSp8A0PtOmArFY'})
-            parsed_response = json.loads(response.text)
-            question_data = parsed_response[0]
+            question_data = self.get_question()[0]
+
+            while "WHICH OF" in question_data["question"].upper():
+                print(f"[{channel_name}] Question contained 'WHICH OF'; Generating new question.")
+                question_data = self.get_question()[0]
+            
+            while "NOT" in question_data["question"]:
+                print(f"[{channel_name}] Question contained 'NOT'; Generating new question.")
+                question_data = self.get_question()[0]
+
+            question_data = self.format_question(question_data)
+
             channel_state['current_question'] = {
                 "category": question_data["category"],
                 "question": question_data["question"],
                 #"answer": "Answer (really unimportant)", #Debug: removing parenthesis
-                "answer": question_data["answer"],
+                "answer": question_data["correct_answer"],
             }
 
             if "(" in channel_state['current_question']["answer"]:
@@ -244,12 +273,9 @@ class Bot(commands.Bot):
                 channel_state['current_question']["answer"] = channel_state['current_question']["answer"][:channel_state['current_question']["answer"].index("(")]
 
             print(f"[{ctx.channel.name}] Trivia Game Started by {ctx.author.name} [category: " + channel_state['current_question']['category'] + "]: Q: " + channel_state['current_question']["question"] + " A: " + channel_state['current_question']["answer"])
-
-            if response.status_code == requests.codes.ok:
-                await ctx.send(f"Trivia question: " + channel_state['current_question']["question"])
-                await self.check_answer(ctx)
-            else:
-                await ctx.send("Error:", response.status_code, response.text)
+            
+            await ctx.send(f"Trivia question: " + channel_state['current_question']["question"])
+            await self.check_answer(ctx)
 
             if channel_state['current_question']:  # If the question hasn't been answered yet
                 await ctx.send("Time's up! The correct answer was: " + channel_state['current_question']["answer"])
