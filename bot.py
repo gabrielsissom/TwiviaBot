@@ -255,6 +255,7 @@ class Bot(commands.Bot):
                 "category": question_data["category"],
                 "question": question_data["question"],
                 "answer": question_data["correct_answer"],
+                "difficulty": question_data["difficulty"]
             }
 
             if "(" in channel_state['current_question']["answer"]:
@@ -263,7 +264,7 @@ class Bot(commands.Bot):
 
             print(f"[{ctx.channel.name}] Trivia Game Started by {ctx.author.name} [category: " + channel_state['current_question']['category'] + "]: Q: " + channel_state['current_question']["question"] + " A: " + channel_state['current_question']["answer"])
             
-            await ctx.send(f"Trivia question: " + channel_state['current_question']["question"])
+            await ctx.send(f"Trivia Question: [Difficulty - {channel_state['current_question']['difficulty']}] " + channel_state['current_question']["question"])
             await self.check_answer(ctx)
 
             if channel_state['current_question']:  # If the question hasn't been answered yet
