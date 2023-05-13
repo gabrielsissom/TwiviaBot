@@ -9,9 +9,12 @@ import sqlite3
 import time
 from difflib import SequenceMatcher
 
+HINT_CHARS_REVEALED = 0.4 # Scale between 0.0 and 1.0 where 1 reveals 100% of the answer.
 TIME_BEFORE_HINT = 20 # Seconds before a hint is given.
 TIME_BEFORE_ANSWER = 10 # Seconds (after hint is given) before the answer is revealed.
 ANSWER_CORRECTNESS = 0.9 # Scale between 0.0 and 1.0 where 1.0 is an exact match.
+CORRECT_ANSWER_VALUE = 1 # Number of points to award for a correct question.
+BOT_PREFIX = '%' # Token required before each command
 
 def get_saved_channels():
     conn = sqlite3.connect('channel_data.db')
@@ -118,27 +121,10 @@ class Bot(commands.Bot):
             token=os.environ['TMI_TOKEN'],
             client_id=os.environ['CLIENT_ID'],
             nick=os.environ['BOT_NICK'],
-            prefix=os.environ['BOT_PREFIX'],
+            prefix=BOT_PREFIX,
             initial_channels=channels
         )
         
-        # self.categories = ['fooddrink']
-        self.categories = [
-            'artliterature',
-            'language',
-            'sciencenature',
-            'general',
-            'fooddrink',
-            'peopleplaces',
-            'geography',
-            'historyholidays',
-            'entertainment',
-            'toysgames',
-            'music',
-            'mathematics',
-            'religionmythology',
-            'sportsleisure'
-            ]
         self.channel_states = {} # key: channel_name, value: channel state
         self.current_question = None
         self.channels = channels
@@ -180,7 +166,7 @@ class Bot(commands.Bot):
         except asyncio.TimeoutError:
             if channel_state['current_question']:
                 answer = channel_state['current_question']["answer"]
-                revealed_chars = int(len(answer) * 0.4) + 1
+                revealed_chars = int(len(answer) * HINT_CHARS_REVEALED) + 1
 
                 # Select random indices to reveal
                 indices_to_reveal = random.sample(range(len(answer)), revealed_chars)
@@ -224,7 +210,7 @@ class Bot(commands.Bot):
         if channel_state['current_question'] and similarity(user_answer, correct_answer) >= ANSWER_CORRECTNESS:
             user = message.author.name
             channel = message.channel.name
-            add_score(channel, user, 1)
+            add_score(channel, user, CORRECT_ANSWER_VALUE)
             print(f"{user} answered with {similarity(user_answer, correct_answer)} accuracy.")
             await message.channel.send(f"{user} answered with {round(similarity(user_answer, correct_answer) * 100, 2)}% accuracy! Their score is now {get_score(channel, user)}. Answer: {channel_state['current_question']['answer']}")
             channel_state['current_question'] = None
@@ -259,12 +245,15 @@ class Bot(commands.Bot):
                 print(f"[{channel_name}] Question contained 'NOT'; Generating new question.")
                 question_data = self.get_question()[0]
 
+            while "WHICH ONE OF" in question_data["question"].upper():
+                print(f"[{channel_name}] Question contained 'WHICH ONE OF'; Generating new question.")
+                question_data = self.get_question()[0]
+
             question_data = self.format_question(question_data)
 
             channel_state['current_question'] = {
                 "category": question_data["category"],
                 "question": question_data["question"],
-                #"answer": "Answer (really unimportant)", #Debug: removing parenthesis
                 "answer": question_data["correct_answer"],
             }
 
