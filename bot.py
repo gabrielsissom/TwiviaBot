@@ -373,6 +373,17 @@ class Bot(commands.Bot):
             "%cooldown [seconds] - Set a cooldown for trivia (mod only) "
         )
 
+    @commands.command()
+    async def announce(self, ctx: commands.Context):
+        if ctx.author.name == 'itssport':
+            announcement = ctx.message.content[10:]
+            for channel_name in self.channels:
+                channel = self.get_channel(channel_name)
+                await channel.send(f"[ANNOUNCEMENT] {announcement}")
+            await ctx.send("Announcement sent to all channels.")
+        else:
+            await ctx.send("You do not have permission to perform this command.")
+
 setup_db()
 channels = get_saved_channels()
 if 'twiviabot' not in channels:
@@ -381,5 +392,3 @@ if 'twiviabot' not in channels:
     print(f"twiviabot not found in channels list on boot, re-added.")
 twiviaBot = Bot()
 twiviaBot.run()
-
-#:)
