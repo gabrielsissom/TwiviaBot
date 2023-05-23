@@ -274,6 +274,8 @@ class Bot(commands.Bot):
                 
                 if not question_contains_phrase and not answer_contains_phrase and not question_contains_NOT:
                     break
+                else:
+                    print(f"[{channel_name}] BANNED PHRASES IN (Q: {question_data['question']} A: {question_data['correct_answer']})")
 
             question_data = self.format_question(question_data)
 
@@ -290,7 +292,7 @@ class Bot(commands.Bot):
 
             print(f"[{ctx.channel.name}] Trivia Game Started by {ctx.author.name} [category: " + channel_state['current_question']['category'] + "]: Q: " + channel_state['current_question']["question"] + " A: " + channel_state['current_question']["answer"])
             
-            await ctx.send(f"Trivia Question: [Difficulty - {channel_state['current_question']['difficulty']}] " + channel_state['current_question']["question"])
+            await ctx.send(f"Trivia: [Category - {channel_state['current_question']['category']}] [Difficulty - {channel_state['current_question']['difficulty'].upper()}] Q: " + channel_state['current_question']["question"])
             await self.check_answer(ctx)
 
             if channel_state['current_question']:  # If the question hasn't been answered yet
