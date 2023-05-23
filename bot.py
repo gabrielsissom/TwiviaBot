@@ -221,7 +221,7 @@ class Bot(commands.Bot):
             user = message.author.name
             channel = message.channel.name
             add_score(channel, user, CORRECT_ANSWER_VALUE)
-            print(f"{user} answered with {similarity(user_answer, correct_answer)} accuracy.")
+            print(f"[{channel}] {user} answered with {similarity(user_answer, correct_answer)} accuracy.")
             await message.channel.send(f"{user} answered with {round(similarity(user_answer, correct_answer) * 100, 2)}% accuracy! Their score is now {get_score(channel, user)}. Answer: {channel_state['current_question']['answer']}")
             channel_state['current_question'] = None
 
@@ -287,7 +287,7 @@ class Bot(commands.Bot):
             }
 
             if "(" in channel_state['current_question']["answer"]:
-                print(f"Removing Parentheses From: {channel_state['current_question']['answer']}")
+                print(f"[{ctx.channel.name}] Removing Parentheses From: {channel_state['current_question']['answer']}")
                 channel_state['current_question']["answer"] = channel_state['current_question']["answer"][:channel_state['current_question']["answer"].index("(")]
 
             print(f"[{ctx.channel.name}] Trivia Game Started by {ctx.author.name} [category: " + channel_state['current_question']['category'] + "]: Q: " + channel_state['current_question']["question"] + " A: " + channel_state['current_question']["answer"])
