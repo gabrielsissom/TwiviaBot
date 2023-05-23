@@ -237,6 +237,8 @@ class Bot(commands.Bot):
         if not channel_state['current_question']:
             question_data = self.get_question()[0]
 
+            # Checking for Mutliple-Choice Necessary questions.
+
             while "WHICH OF" in question_data["question"].upper():
                 print(f"[{channel_name}] Question contained 'WHICH OF'; Generating new question.")
                 question_data = self.get_question()[0]
@@ -247,6 +249,14 @@ class Bot(commands.Bot):
 
             while "WHICH ONE OF" in question_data["question"].upper():
                 print(f"[{channel_name}] Question contained 'WHICH ONE OF'; Generating new question.")
+                question_data = self.get_question()[0]
+
+            while "THE FOLLOWING" in question_data["question"].upper():
+                print(f"[{channel_name}] Question contained 'THE FOLLOWING'; Generating new question.")
+                question_data = self.get_question()[0]
+
+            while "ALL OF THE ABOVE" in question_data["answer"].upper():
+                print(f"[{channel_name}] Answer contained 'ALL OF THE ABOVE'; Generating new question.")
                 question_data = self.get_question()[0]
 
             question_data = self.format_question(question_data)
