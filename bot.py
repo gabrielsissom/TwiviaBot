@@ -354,9 +354,10 @@ class Bot(commands.Bot):
     async def skip(self, ctx: commands.Context):
         channel_state = self.get_channel_state(ctx.channel.name)
         if ctx.author.is_mod or ctx.author.name == 'itssport':
-            await ctx.send(f'Question skipped. A: ' + channel_state['current_question']["answer"])
-            print(f"[{ctx.channel.name}] Question skipped by {ctx.author.name}")
-            channel_state['current_question'] = None
+            if not channel_state['current_question'] == None:
+                await ctx.send(f'Question skipped. A: ' + channel_state['current_question']["answer"])
+                print(f"[{ctx.channel.name}] Question skipped by {ctx.author.name}")
+                channel_state['current_question'] = None
         else:
             await ctx.send("You must be a moderator to use this command.")
 
