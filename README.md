@@ -9,7 +9,9 @@ Bot made using [TwitchIO](https://twitchio.dev/en/latest/index.html). Very simpl
 To run bot.py you will need a local .env file with the following variables:
 `
 TMI_TOKEN=oauth:pjwk******************
+
 CLIENT_ID=lgs0w*******************
+
 BOT_NICK=TwiviaBot
 `
 
