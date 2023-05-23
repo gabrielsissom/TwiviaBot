@@ -16,6 +16,16 @@ ANSWER_CORRECTNESS = 0.9 # Scale between 0.0 and 1.0 where 1.0 is an exact match
 CORRECT_ANSWER_VALUE = 1 # Number of points to award for a correct question.
 BOT_PREFIX = '%' # Token required before each command
 
+BANNED_IN_QUESTIONS = [
+    "WHICH OF",
+    "WHICH ONE OF",
+    "THE FOLLOWING"
+]
+
+BANNED_IN_ANSWER = [
+    "ALL OF THE ABOVE"
+]
+
 def get_saved_channels():
     conn = sqlite3.connect('channel_data.db')
     c = conn.cursor()
@@ -235,29 +245,35 @@ class Bot(commands.Bot):
         channel_state['last_trivia'] = time.time()
         
         if not channel_state['current_question']:
-            question_data = self.get_question()[0]
 
-            # Checking for Mutliple-Choice Necessary questions.
+            # Checking for phrases banned in question and answer.
 
-            while "WHICH OF" in question_data["question"].upper():
-                print(f"[{channel_name}] Question contained 'WHICH OF'; Generating new question.")
+            while True:
                 question_data = self.get_question()[0]
-            
-            while "NOT" in question_data["question"]:
-                print(f"[{channel_name}] Question contained 'NOT'; Generating new question.")
-                question_data = self.get_question()[0]
+                
+                question_contains_phrase = False
+                for phrase in BANNED_IN_QUESTIONS:
+                    if phrase in question_data["question"].upper():
+                        print(f"[{channel_name}] Question contained '{phrase}'; Generating new question.")
+                        question_contains_phrase = True
+                        break
 
-            while "WHICH ONE OF" in question_data["question"].upper():
-                print(f"[{channel_name}] Question contained 'WHICH ONE OF'; Generating new question.")
-                question_data = self.get_question()[0]
+                answer_contains_phrase = False
+                for phrase in BANNED_IN_ANSWER:
+                    if phrase in question_data["correct_answer"].upper():
+                        print(f"[{channel_name}] Answer contained '{phrase}'; Generating new question.")
+                        answer_contains_phrase = True
+                        break
 
-            while "THE FOLLOWING" in question_data["question"].upper():
-                print(f"[{channel_name}] Question contained 'THE FOLLOWING'; Generating new question.")
-                question_data = self.get_question()[0]
-
-            while "ALL OF THE ABOVE" in question_data["answer"].upper():
-                print(f"[{channel_name}] Answer contained 'ALL OF THE ABOVE'; Generating new question.")
-                question_data = self.get_question()[0]
+                # Questions containing 'NOT' in all caps are an edge-case, and should not
+                # be compared to the question with .upper()
+                question_contains_NOT = False
+                if "NOT" in question_data["question"]:
+                    print(f"[{channel_name}] Question contained 'NOT'; Generating new question.")
+                    question_contains_NOT = True
+                
+                if not question_contains_phrase and not answer_contains_phrase and not question_contains_NOT:
+                    break
 
             question_data = self.format_question(question_data)
 
