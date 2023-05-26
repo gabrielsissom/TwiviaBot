@@ -470,12 +470,15 @@ class Bot(commands.Bot):
     else:
       await ctx.send("You do not have permission to perform this command.")
 
-
-setup_db()
-channels = get_saved_channels()
-if 'twiviabot' not in channels:
-  add_channel('twiviabot')
+def main():
+  setup_db()
   channels = get_saved_channels()
-  print("twiviabot not found in channels list on boot, re-added.")
-twiviaBot = Bot()
-twiviaBot.run()
+  if 'twiviabot' not in channels:
+    add_channel('twiviabot')
+    channels = get_saved_channels()
+    print("twiviabot not found in channels list on boot, re-added.")
+  twiviaBot = Bot()
+  twiviaBot.run()
+
+if __name__ == "__main__":
+    main()
