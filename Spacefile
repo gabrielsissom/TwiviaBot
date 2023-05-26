@@ -5,3 +5,16 @@ micros:
     src: ./
     engine: python3.9
     primary: true
+    presets:
+      env:
+        - name: TMI_TOKEN
+          description: Twitch OAUTH 2.0 Token
+          default: "oauth:pjwk79noicx8pii18w70sta3wi88nw"
+      env:
+        - name: CLIENT_ID
+          description: Twitch Client ID
+          default: "lgs0w3x9svkdl46ino67jh2bw2aqjf"
+      env: 
+        - name: BOT_NICK
+         descrition: Twitch Account name for bot
+         default: "TwiviaBot"
