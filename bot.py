@@ -9,7 +9,6 @@ import sqlite3
 import time
 from difflib import SequenceMatcher
 
-
 #GLOBAL CONSTANTS
 HINT_CHARS_REVEALED = 0.4  # Scale between 0.0 and 1.0 where 1 reveals 100% of the answer.
 TIME_BEFORE_HINT = 20  # Seconds before a hint is given.
