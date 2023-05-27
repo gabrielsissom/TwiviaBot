@@ -16,4 +16,4 @@ BOT_NICK=TwiviaBot
 
 You can get your own token, client ID, and bot with a new (or your own) twitch account.
 
-Run command: `python bot.py`
+Run command: `python3 bot.py`
