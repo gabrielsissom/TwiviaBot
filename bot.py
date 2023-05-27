@@ -470,6 +470,7 @@ class Bot(commands.Bot):
     else:
       await ctx.send("You do not have permission to perform this command.")
 
+
 def main():
   setup_db()
   channels = get_saved_channels()
@@ -480,5 +481,6 @@ def main():
   twiviaBot = Bot(channels)
   twiviaBot.run()
 
+
 if __name__ == "__main__":
-    main()
+  main()
