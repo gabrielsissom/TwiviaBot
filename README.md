@@ -6,7 +6,7 @@ Bot made using [TwitchIO](https://twitchio.dev/en/latest/index.html). Very simpl
 
 [Database](https://opentdb.com/) used for trivia questions.
 
-To run bot.py you will need a local .env file with the following variables:
+To run bot.py you will need the following environment variables:
 
 `
 TMI_TOKEN=oauth:pjwk****************** 
@@ -16,4 +16,4 @@ BOT_NICK=TwiviaBot
 
 You can get your own token, client ID, and bot with a new (or your own) twitch account.
 
-Run command: `pipenv run python bot.py`
+Run command: `python bot.py`
