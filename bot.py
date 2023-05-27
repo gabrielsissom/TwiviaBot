@@ -142,7 +142,7 @@ def similarity(a, b):
 
 class Bot(commands.Bot):
 
-  def __init__(self):
+  def __init__(self, channels):
     super().__init__(token=os.environ['TMI_TOKEN'],
                      client_id=os.environ['CLIENT_ID'],
                      nick=os.environ['BOT_NICK'],
@@ -477,7 +477,7 @@ def main():
     add_channel('twiviabot')
     channels = get_saved_channels()
     print("twiviabot not found in channels list on boot, re-added.")
-  twiviaBot = Bot()
+  twiviaBot = Bot(channels)
   twiviaBot.run()
 
 if __name__ == "__main__":
