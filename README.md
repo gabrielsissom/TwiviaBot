@@ -1,4 +1,4 @@
-# TwiviaBotv2
+# TwiviaBot
 
 **Resources**:
 
