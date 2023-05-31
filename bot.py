@@ -353,44 +353,62 @@ class Bot(commands.Bot):
       await ctx.send("A trivia question is already active!")
 
   @commands.command()
-  async def join(self, ctx: commands.Context, channel_name: str = None):
-    if channel_name == None:
-      channel_name = ctx.author.name
+  async def join(self, ctx: commands.Context):
+    channel_name = ctx.author.name
     if ctx.channel.name == 'twiviabot':
-      if (channel_name == ctx.author.name) or (ctx.author.name == 'itssport'):
-        if channel_name not in self.channels:
-          await self.join_channels([channel_name])
-          self.channels.append(channel_name)
-          add_channel(channel_name)
-          print(f"TwiviaBot has joined channel {channel_name}.")
-          await ctx.send(
-            f"Twivia bot has joined channel {channel_name}. Make sure to /mod TwiviaBot."
-          )
-        else:
-          await ctx.send(f"Already in channel {channel_name}")
+      if channel_name not in self.channels:
+        await self.join_channels([channel_name])
+        self.channels.append(channel_name)
+        add_channel(channel_name)
+        print(f"TwiviaBot has joined channel {channel_name}.")
+        await ctx.send(
+          f"Twivia bot has joined channel {channel_name}. Make sure to /mod TwiviaBot."
+        )
       else:
-        await ctx.send("You may only add the bot to your own channel.")
+        await ctx.send(f"Already in channel {channel_name}")
     else:
       await ctx.send("This command may only be used in TwiviaBot's chat.")
 
   @commands.command()
-  async def part(self, ctx: commands.Context, channel_name: str = None):
-    if channel_name == None:
-      channel_name = ctx.author.name
-    if (ctx.channel.name == 'twiviabot'):
-      if (channel_name == ctx.author.name) or (ctx.author.name == 'itssport'):
-        if channel_name in self.channels:
-          await self.part_channels([channel_name])
-          self.channels.remove(channel_name)
-          remove_channel(channel_name)
-          print(f"TwiviaBot has left channel {channel_name}.")
-          await ctx.send(f"TwiviaBot has left channel {channel_name}.")
-        else:
-          await ctx.send(f"Channel {channel_name} not found in the list.")
+  async def forcejoin(self, ctx: commands.Context, channel_name: str = None):
+    if ctx.author.name == 'itssport' and not channel_name == None:
+      if channel_name not in self.channels:
+        await self.join_channels([channel_name])
+        self.channels.append(channel_name)
+        add_channel(channel_name)
+        print(f"TwiviaBot has joined channel {channel_name}.")
+        await ctx.send(
+          f"Twivia bot has joined channel {channel_name}. Make sure to /mod TwiviaBot."
+        )
       else:
-        await ctx.send("You may only remove the bot from your own channel.")
+        await ctx.send(f"Already in channel {channel_name}")
+
+  @commands.command()
+  async def part(self, ctx: commands.Context):
+    channel_name = ctx.author.name
+    if (ctx.channel.name == 'twiviabot'):
+      if channel_name in self.channels:
+        await self.part_channels([channel_name])
+        self.channels.remove(channel_name)
+        remove_channel(channel_name)
+        print(f"TwiviaBot has left channel {channel_name}.")
+        await ctx.send(f"TwiviaBot has left channel {channel_name}.")
+      else:
+        await ctx.send(f"Channel {channel_name} not found in the list.")
     else:
       await ctx.send("This command may only be used in TwiviaBot's chat.")
+
+  @commands.command()
+  async def forcepart(self, ctx: commands.Context, channel_name: str = None):
+    if ctx.author.name == 'itssport' and not channel_name == None:
+      if channel_name in self.channels:
+        await self.part_channels([channel_name])
+        self.channels.remove(channel_name)
+        remove_channel(channel_name)
+        print(f"TwiviaBot has left channel {channel_name}.")
+        await ctx.send(f"TwiviaBot has left channel {channel_name}.")
+      else:
+        await ctx.send(f"Channel {channel_name} not found in the list.")
 
   @commands.command()
   async def points(self, ctx: commands.Context):
