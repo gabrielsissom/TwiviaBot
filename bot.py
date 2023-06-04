@@ -7,6 +7,7 @@ import html
 import json
 import sqlite3
 import time
+from replit import db
 from difflib import SequenceMatcher
 
 #GLOBAL CONSTANTS
@@ -20,6 +21,8 @@ BOT_PREFIX = '%'  # Token required before each command
 BANNED_IN_QUESTIONS = ["WHICH OF", "WHICH ONE OF", "THE FOLLOWING"]
 
 BANNED_IN_ANSWER = ["ALL OF THE ABOVE"]
+
+REVEAL_IN_HINT = ["-", ",", "$", "%", ".", "/"]
 
 
 def get_saved_channels():
@@ -200,7 +203,7 @@ class Bot(commands.Bot):
         for i, char in enumerate(answer):
           if char == ' ':
             hint += ' '
-          elif i in indices_to_reveal:
+          elif (i in indices_to_reveal) or (char in REVEAL_IN_HINT):
             hint += char
           else:
             hint += '_'  # Add space between each character
@@ -452,8 +455,13 @@ class Bot(commands.Bot):
 
         cooldown = get_channel_cooldown(channel_name)
         time_since_last_trivia = time.time() - channel_state['last_trivia']
+
+        cooldown_remaining = cooldown - int(time_since_last_trivia)
+        if cooldown_remaining < 0:
+          cooldown_remaining = 0
+
         await ctx.send(
-          f"{ctx.channel.name}'s trivia cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)}s remaining]"
+          f"{ctx.channel.name}'s trivia cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown_remaining}s remaining]"
         )
     else:
       channel_name = ctx.channel.name
@@ -502,3 +510,5 @@ def main():
 
 if __name__ == "__main__":
   main()
+matches = db.prefix("prefix")
+matches = db.prefix("prefix")
