@@ -7,7 +7,6 @@ import html
 import json
 import sqlite3
 import time
-from replit import db
 from difflib import SequenceMatcher
 
 #GLOBAL CONSTANTS
@@ -404,14 +403,11 @@ class Bot(commands.Bot):
   @commands.command()
   async def forcepart(self, ctx: commands.Context, channel_name: str = None):
     if ctx.author.name == 'itssport' and not channel_name == None:
-      if channel_name in self.channels:
-        await self.part_channels([channel_name])
-        self.channels.remove(channel_name)
-        remove_channel(channel_name)
-        print(f"TwiviaBot has left channel {channel_name}.")
-        await ctx.send(f"TwiviaBot has left channel {channel_name}.")
-      else:
-        await ctx.send(f"Channel {channel_name} not found in the list.")
+      await self.part_channels([channel_name])
+      self.channels.remove(channel_name)
+      remove_channel(channel_name)
+      print(f"TwiviaBot has left channel {channel_name}.")
+      await ctx.send(f"TwiviaBot has left channel {channel_name}.")
 
   @commands.command()
   async def points(self, ctx: commands.Context):
@@ -510,5 +506,3 @@ def main():
 
 if __name__ == "__main__":
   main()
-matches = db.prefix("prefix")
-matches = db.prefix("prefix")
