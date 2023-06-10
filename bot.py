@@ -1,12 +1,5 @@
+import os, random, asyncio, html, json, sqlite3, time, requests
 from twitchio.ext import commands
-import os
-import random
-import asyncio
-import requests
-import html
-import json
-import sqlite3
-import time
 from difflib import SequenceMatcher
 
 #GLOBAL CONSTANTS
@@ -143,7 +136,6 @@ def similarity(a, b):
 
 
 class Bot(commands.Bot):
-
   def __init__(self, channels):
     super().__init__(token=os.environ['TMI_TOKEN'],
                      client_id=os.environ['CLIENT_ID'],
