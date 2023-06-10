@@ -16,14 +16,11 @@ BANNED_IN_ANSWER = ["ALL OF THE ABOVE"]
 
 REVEAL_IN_HINT = ["-", ",", "$", "%", ".", "/"]
 
-
-def get_saved_channels():
-  conn = sqlite3.connect('channel_data.db')
-  c = conn.cursor()
-  c.execute('SELECT name FROM channels')
-  result = c.fetchall()
-  conn.close()
-  return [channel[0] for channel in result]
+CATEGORIES = {"ALL": 0, "GENERAL": 9, "BOOKS": 10, "FILMS": 11, "MUSIC": 12, "THEATRE": 13, "TV": 14, 
+              "VIDEOGAMES": 15, "BOARDGAMES": 16, "SCIENCE/NATURE": 17, "COMPUTERS": 18, 
+              "MATHEMATICS": 19, "MYTHOLOGY": 20, "SPORTS": 21, "GEOGRAPHY": 22, 
+              "HISTORY": 23, "POLITICS": 24, "ART": 25, "CELEBRITIES": 26, "ANIMALS": 27, 
+              "VEHICLES": 28, "COMICS": 29, "GADGETS": 30, "ANIME": 31, "ANIMATION": 32}
 
 
 def setup_db():
@@ -47,10 +44,24 @@ def setup_db():
                  cooldown INTEGER,
                  FOREIGN KEY (channel) REFERENCES channels (name)
              )''')
+  
+  c.execute('''CREATE TABLE IF NOT EXISTS channel_categories (
+                 channel TEXT PRIMARY KEY,
+                 category TEXT,
+                 FOREIGN KEY (channel) REFERENCES channels (name)
+             )''')
 
   conn.commit()
   conn.close()
 
+
+def get_saved_channels():
+  conn = sqlite3.connect('channel_data.db')
+  c = conn.cursor()
+  c.execute('SELECT name FROM channels')
+  result = c.fetchall()
+  conn.close()
+  return [channel[0] for channel in result]
 
 def get_top_users(channel_name, limit=5):
   conn = sqlite3.connect('channel_data.db')
@@ -62,7 +73,6 @@ def get_top_users(channel_name, limit=5):
   conn.close()
   return result
 
-
 def get_channel_cooldown(channel_name):
   conn = sqlite3.connect('channel_data.db')
   c = conn.cursor()
@@ -71,7 +81,6 @@ def get_channel_cooldown(channel_name):
   result = c.fetchone()
   conn.close()
   return result[0] if result else 30  # Default cooldown is 30 seconds
-
 
 def set_channel_cooldown(channel_name, cooldown):
   conn = sqlite3.connect('channel_data.db')
@@ -82,6 +91,23 @@ def set_channel_cooldown(channel_name, cooldown):
   conn.commit()
   conn.close()
 
+def set_channel_category(channel_name, category):
+  conn = sqlite3.connect('channel_data.db')
+  c = conn.cursor()
+  c.execute(
+    'INSERT OR REPLACE INTO channel_categories (channel, category) VALUES (?, ?)',
+    (channel_name, category))
+  conn.commit()
+  conn.close()
+
+def get_channel_category(channel_name):
+  conn = sqlite3.connect('channel_data.db')
+  c = conn.cursor()
+  c.execute('SELECT category FROM channel_categories WHERE channel = ?',
+            (channel_name, ))
+  result = c.fetchone()
+  conn.close()
+  return result[0] if result else 'ALL'  # Default cooldown is 30 seconds
 
 def add_channel(channel_name):
   conn = sqlite3.connect('channel_data.db')
@@ -147,8 +173,18 @@ class Bot(commands.Bot):
     self.current_question = None
     self.channels = channels
 
-  def get_question(self):
+  def get_question(self, channel_name):
     api_url = 'https://opentdb.com/api.php?amount=1&type=multiple'
+    categories = get_channel_category(channel_name)
+    cat_ids = []
+    for category in CATEGORIES:
+      if category in categories:
+        cat_ids.append(CATEGORIES[category])
+    
+    if not 0 in cat_ids:
+      id = random.choice(cat_ids)
+      api_url = f"https://opentdb.com/api.php?amount=1&category={id}&type=multiple"
+
     response = requests.get(api_url)
 
     if response.status_code == requests.codes.ok:
@@ -271,7 +307,7 @@ class Bot(commands.Bot):
       # Checking for phrases banned in question and answer.
 
       while True:
-        question_data = self.get_question()[0]
+        question_data = self.get_question(channel_name)[0]
 
         question_contains_phrase = False
         for phrase in BANNED_IN_QUESTIONS:
@@ -462,6 +498,61 @@ class Bot(commands.Bot):
       await ctx.send(
         f"{ctx.channel.name}'s trivia cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)}s remaining]"
       )
+
+  @commands.command()
+  async def category(self, ctx: commands.Context, category: str = None):
+    channel_state = self.get_channel_state(ctx.channel.name)
+    channel_name = ctx.channel.name
+
+    if (ctx.author.is_mod) or (ctx.author.name == 'itssport'):
+      if not category == None:
+        if "," in category:
+          split_categories = category.split(",")
+        else:
+          split_categories = [category]
+        new_categories = ""
+        invalid_categories = ""
+
+        for i in split_categories:
+          if i.upper() in CATEGORIES:
+            new_categories += f" {i.upper()}"
+          else:
+            invalid_categories += f" {i.upper()}"
+
+        if "ALL" in new_categories:
+          new_categories = "ALL"
+          invalid_categories = ""
+
+        print(new_categories)
+
+        if not invalid_categories == "":
+          await ctx.send(f"The following categories were invalid: {invalid_categories}")
+        
+        if not new_categories == "":
+          set_channel_category(ctx.channel.name, new_categories)
+          
+        print(f"[{channel_name}] Categories set to {get_channel_category(channel_name)}")
+        await ctx.send(
+          f"Categories set to {get_channel_category(channel_name)} for {ctx.channel.name}.")
+      else:
+        category = get_channel_category(channel_name)
+        await ctx.send(
+          f"{ctx.channel.name}'s trivia categories are set to {get_channel_category(ctx.channel.name)}."
+        )
+    else:
+      category = get_channel_category(channel_name)
+      await ctx.send(
+        f"{ctx.channel.name}'s trivia categories are set to {get_channel_category(ctx.channel.name)}."
+      )
+
+  @commands.command()
+  async def categories(self, ctx: commands.Context):
+    all_cats = ""
+    for category in CATEGORIES:
+      all_cats += f"{category}, "
+    all_cats = all_cats[:-2]
+
+    await ctx.send(f"Available categories: {all_cats}.")
 
   @commands.command()
   async def help(self, ctx: commands.Context):

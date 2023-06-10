@@ -15,6 +15,7 @@ def main():
     print_table("channels")
     print_table("users")
     print_table("channel_cooldowns")
+    print_table("channel_categories")
 
 if __name__ == "__main__":
     main()
