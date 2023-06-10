@@ -28,12 +28,13 @@ A trivia game bot for your Twitch chat. To get started, visit [TwiviaBot's chann
 
 **%cooldown - Displays/Modifies the amount of time before a new trivia game may be started.**
  - To modify a channel's cooldown, use the command `%cooldown [time]` where `[time]` is a number of seconds. ex: `%cooldown 300` (5 minute cooldown)
- - Only the **channel owner** or a **moderator** of the channel may modify the channel cooldown. For all other users, the command will simply display the total and remaining cooldown for the trivia game. 
+ - Only the **channel owner** or a **moderator** of the channel may modify the channel cooldown. For all other users, the command will display the total and remaining cooldown for the trivia game. 
 
 **%category - Displays/Modifies the trivia question categories for the channel.**
- - To modify a channel's categories, use the command `%category [category]`. To select more than one category, separate each category with a commma and **NO SPACES**. ex: `%category anime,general,videogames` 
+ - To modify a channel's categories, use the command `%category [category]`. 
+ - To select more than one category, separate each category with a commma and **NO SPACES**. ex: `%category anime,general,videogames` 
  - To return to all categories, set the categories to 'all'. ex: `%category all`.
- - To see a list of all available categories, use the %categories command.
+ - Only the **channel owner** or a **moderator** of the channel may modify the channel categories. For all other users, the command will display the channel's selected categories. 
 
  **%categories - Displays a list of all selectable categories.**
  - Available categories: ALL, GENERAL, BOOKS, FILMS, MUSIC, THEATRE, TV, VIDEOGAMES, BOARDGAMES, SCIENCE/NATURE, COMPUTERS, MATHEMATICS, MYTHOLOGY, SPORTS, GEOGRAPHY, HISTORY, POLITICS, ART, CELEBRITIES, ANIMALS, VEHICLES, COMICS, GADGETS, ANIME, ANIMATION. 
