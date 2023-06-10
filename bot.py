@@ -530,7 +530,7 @@ class Bot(commands.Bot):
         
         if not new_categories == "":
           set_channel_category(ctx.channel.name, new_categories)
-          
+
         print(f"[{channel_name}] Categories set to {get_channel_category(channel_name)}")
         await ctx.send(
           f"Categories set to {get_channel_category(channel_name)} for {ctx.channel.name}.")
@@ -557,12 +557,7 @@ class Bot(commands.Bot):
   @commands.command()
   async def help(self, ctx: commands.Context):
     await ctx.send(
-      "COMMANDS: " + "%join / %part - Add or remove bot from your channel | " +
-      "%trivia - Start a new trivia game | " +
-      "%points - See how many points you have | " +
-      "%leaderboard - Show top 5 users in this channel | " +
-      "%skip - Skip the current question (mod only) | " +
-      "%cooldown [seconds] - Set a cooldown for trivia (mod only) ")
+      "To view a list of commands/functionality, view the README here: https://bit.ly/45W9oLe")
 
   @commands.command()
   async def announce(self, ctx: commands.Context):
