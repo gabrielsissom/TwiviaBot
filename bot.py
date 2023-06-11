@@ -6,6 +6,7 @@ from difflib import SequenceMatcher
 HINT_CHARS_REVEALED = 0.4  # Scale between 0.0 and 1.0 where 1 reveals 100% of the answer.
 TIME_BEFORE_HINT = 20  # Seconds before a hint is given.
 TIME_BEFORE_ANSWER = 10  # Seconds (after hint is given) before the answer is revealed.
+ANSWER_CLOSE = 0.8 # Scale between 0.0 and 1.0 where 1.0 is an exact match. Announces that a user is close to the correct answer.
 ANSWER_CORRECTNESS = 0.9  # Scale between 0.0 and 1.0 where 1.0 is an exact match.
 CORRECT_ANSWER_VALUE = 1  # Number of points to award for a correct question.
 BOT_PREFIX = '%'  # Token required before each command
@@ -268,6 +269,13 @@ class Bot(commands.Bot):
     correct_answer = channel_state['current_question']['answer'].lower(
     ) if channel_state['current_question'] else None
 
+    if ((channel_state['current_question']) and 
+      (similarity(user_answer, correct_answer) >= ANSWER_CLOSE) and 
+      (similarity(user_answer, correct_answer) < ANSWER_CORRECTNESS)
+    ):
+      user = message.author.name
+      await message.channel.send(f"{user} is close! {round(similarity(user_answer, correct_answer) * 100, 2)}% accurate.")
+    
     if channel_state['current_question'] and similarity(
         user_answer, correct_answer) >= ANSWER_CORRECTNESS:
       user = message.author.name
