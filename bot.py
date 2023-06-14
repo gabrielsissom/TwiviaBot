@@ -15,7 +15,7 @@ BANNED_IN_QUESTIONS = ["WHICH OF", "WHICH ONE OF", "THE FOLLOWING"]
 
 BANNED_IN_ANSWER = ["ALL OF THE ABOVE"]
 
-REVEAL_IN_HINT = ["-", ",", "$", "%", ".", "/"]
+REVEAL_IN_HINT = ["-", ",", "$", "%", ".", "/", "'", '"']
 
 CATEGORIES = {"ALL": 0, "GENERAL": 9, "BOOKS": 10, "FILMS": 11, "MUSIC": 12, "THEATRE": 13, "TV": 14, 
               "VIDEOGAMES": 15, "BOARDGAMES": 16, "SCIENCE/NATURE": 17, "COMPUTERS": 18, 
@@ -476,9 +476,12 @@ class Bot(commands.Bot):
 
     if (ctx.author.is_mod) or (ctx.author.name == 'itssport'):
       if cooldown is not None:
-        set_channel_cooldown(ctx.channel.name, cooldown)
-        await ctx.send(
-          f"Cooldown set to {cooldown} seconds for {ctx.channel.name}.")
+        if cooldown >= 0:
+          set_channel_cooldown(ctx.channel.name, cooldown)
+          await ctx.send(
+            f"Cooldown set to {cooldown} seconds for {ctx.channel.name}.")
+        else:
+          await ctx.send("Cooldown may not be negative.")
       else:
         channel_name = ctx.channel.name
 
