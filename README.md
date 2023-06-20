@@ -2,6 +2,8 @@
 
 A trivia game bot for your Twitch chat. To get started, visit [TwiviaBot's channel](https://www.twitch.tv/twiviabot) and use the %join command in its chat. 
 
+![Join Image](/images/join.png)
+
 ## Commands:
 
 **%join - Makes TwiviaBot join your channel.**
