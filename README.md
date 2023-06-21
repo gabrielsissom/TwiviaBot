@@ -16,8 +16,8 @@ A trivia game bot for your Twitch chat. To get started, visit [TwiviaBot's chann
 
 ### %trivia - Starts a trivia game in the channel.
 - A trivia game may be started by any channel member.
-- Answers to trivia questions must be a 90% match to be counted as correct.
-- The category and difficulty of each question is random. (Coming Soon: Channel owners and moderators will be able to select categories and difficulties.)
+- Answers to trivia questions must be above a 90% match to be counted as correct.
+- Answers to trivia questions above an 80% match will be announced as 'close'.
 
 ### %points - Displays the total points of a user in the current channel.
 - Points are tracked separately in different Twitch channels.
