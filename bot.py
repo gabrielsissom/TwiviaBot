@@ -6,22 +6,46 @@ from difflib import SequenceMatcher
 HINT_CHARS_REVEALED = 0.4  # Scale between 0.0 and 1.0 where 1 reveals 100% of the answer.
 TIME_BEFORE_HINT = 20  # Seconds before a hint is given.
 TIME_BEFORE_ANSWER = 10  # Seconds (after hint is given) before the answer is revealed.
-ANSWER_CLOSE = 0.8 # Scale between 0.0 and 1.0 where 1.0 is an exact match. Announces that a user is close to the correct answer.
+ANSWER_CLOSE = 0.8  # Scale between 0.0 and 1.0 where 1.0 is an exact match. Announces that a user is close to the correct answer.
 ANSWER_CORRECTNESS = 0.9  # Scale between 0.0 and 1.0 where 1.0 is an exact match.
 CORRECT_ANSWER_VALUE = 1  # Number of points to award for a correct question.
 BOT_PREFIX = '%'  # Token required before each command
 
-BANNED_IN_QUESTIONS = ["WHICH OF", "WHICH ONE OF", "THE FOLLOWING"]
+BANNED_IN_QUESTIONS = [
+  "WHICH OF", "WHICH ONE OF", "THE FOLLOWING", "OUT OF THESE"
+]
 
 BANNED_IN_ANSWER = ["ALL OF THE ABOVE"]
 
 REVEAL_IN_HINT = ["-", ",", "$", "%", ".", "/", "'", '"']
 
-CATEGORIES = {"ALL": 0, "GENERAL": 9, "BOOKS": 10, "FILMS": 11, "MUSIC": 12, "THEATRE": 13, "TV": 14, 
-              "VIDEOGAMES": 15, "BOARDGAMES": 16, "SCIENCE/NATURE": 17, "COMPUTERS": 18, 
-              "MATHEMATICS": 19, "MYTHOLOGY": 20, "SPORTS": 21, "GEOGRAPHY": 22, 
-              "HISTORY": 23, "POLITICS": 24, "ART": 25, "CELEBRITIES": 26, "ANIMALS": 27, 
-              "VEHICLES": 28, "COMICS": 29, "GADGETS": 30, "ANIME": 31, "ANIMATION": 32}
+CATEGORIES = {
+  "ALL": 0,
+  "GENERAL": 9,
+  "BOOKS": 10,
+  "FILMS": 11,
+  "MUSIC": 12,
+  "THEATRE": 13,
+  "TV": 14,
+  "VIDEOGAMES": 15,
+  "BOARDGAMES": 16,
+  "SCIENCE/NATURE": 17,
+  "COMPUTERS": 18,
+  "MATHEMATICS": 19,
+  "MYTHOLOGY": 20,
+  "SPORTS": 21,
+  "GEOGRAPHY": 22,
+  "HISTORY": 23,
+  "POLITICS": 24,
+  "ART": 25,
+  "CELEBRITIES": 26,
+  "ANIMALS": 27,
+  "VEHICLES": 28,
+  "COMICS": 29,
+  "GADGETS": 30,
+  "ANIME": 31,
+  "ANIMATION": 32
+}
 
 
 def setup_db():
@@ -45,7 +69,7 @@ def setup_db():
                  cooldown INTEGER,
                  FOREIGN KEY (channel) REFERENCES channels (name)
              )''')
-  
+
   c.execute('''CREATE TABLE IF NOT EXISTS channel_categories (
                  channel TEXT PRIMARY KEY,
                  category TEXT,
@@ -64,6 +88,7 @@ def get_saved_channels():
   conn.close()
   return [channel[0] for channel in result]
 
+
 def get_top_users(channel_name, limit=5):
   conn = sqlite3.connect('channel_data.db')
   c = conn.cursor()
@@ -74,6 +99,7 @@ def get_top_users(channel_name, limit=5):
   conn.close()
   return result
 
+
 def get_channel_cooldown(channel_name):
   conn = sqlite3.connect('channel_data.db')
   c = conn.cursor()
@@ -82,6 +108,7 @@ def get_channel_cooldown(channel_name):
   result = c.fetchone()
   conn.close()
   return result[0] if result else 30  # Default cooldown is 30 seconds
+
 
 def set_channel_cooldown(channel_name, cooldown):
   conn = sqlite3.connect('channel_data.db')
@@ -92,6 +119,7 @@ def set_channel_cooldown(channel_name, cooldown):
   conn.commit()
   conn.close()
 
+
 def set_channel_category(channel_name, category):
   conn = sqlite3.connect('channel_data.db')
   c = conn.cursor()
@@ -101,6 +129,7 @@ def set_channel_category(channel_name, category):
   conn.commit()
   conn.close()
 
+
 def get_channel_category(channel_name):
   conn = sqlite3.connect('channel_data.db')
   c = conn.cursor()
@@ -109,6 +138,7 @@ def get_channel_category(channel_name):
   result = c.fetchone()
   conn.close()
   return result[0] if result else 'ALL'  # Default cooldown is 30 seconds
+
 
 def add_channel(channel_name):
   conn = sqlite3.connect('channel_data.db')
@@ -163,6 +193,7 @@ def similarity(a, b):
 
 
 class Bot(commands.Bot):
+
   def __init__(self, channels):
     super().__init__(token=os.environ['TMI_TOKEN'],
                      client_id=os.environ['CLIENT_ID'],
@@ -181,7 +212,7 @@ class Bot(commands.Bot):
     for category in CATEGORIES:
       if category in categories:
         cat_ids.append(CATEGORIES[category])
-    
+
     if not 0 in cat_ids:
       id = random.choice(cat_ids)
       api_url = f"https://opentdb.com/api.php?amount=1&category={id}&type=multiple"
@@ -269,13 +300,14 @@ class Bot(commands.Bot):
     correct_answer = channel_state['current_question']['answer'].lower(
     ) if channel_state['current_question'] else None
 
-    if ((channel_state['current_question']) and 
-      (similarity(user_answer, correct_answer) >= ANSWER_CLOSE) and 
-      (similarity(user_answer, correct_answer) < ANSWER_CORRECTNESS)
-    ):
+    if ((channel_state['current_question'])
+        and (similarity(user_answer, correct_answer) >= ANSWER_CLOSE)
+        and (similarity(user_answer, correct_answer) < ANSWER_CORRECTNESS)):
       user = message.author.name
-      await message.channel.send(f"{user} is close! {round(similarity(user_answer, correct_answer) * 100, 2)}% accurate.")
-    
+      await message.channel.send(
+        f"{user} is close! {round(similarity(user_answer, correct_answer) * 100, 2)}% accurate."
+      )
+
     if channel_state['current_question'] and similarity(
         user_answer, correct_answer) >= ANSWER_CORRECTNESS:
       user = message.author.name
@@ -512,7 +544,6 @@ class Bot(commands.Bot):
 
   @commands.command()
   async def category(self, ctx: commands.Context, category: str = None):
-    channel_state = self.get_channel_state(ctx.channel.name)
     channel_name = ctx.channel.name
 
     if (ctx.author.is_mod) or (ctx.author.name == 'itssport'):
@@ -537,14 +568,18 @@ class Bot(commands.Bot):
         print(new_categories)
 
         if not invalid_categories == "":
-          await ctx.send(f"The following categories were invalid: {invalid_categories}")
-        
+          await ctx.send(
+            f"The following categories were invalid: {invalid_categories}")
+
         if not new_categories == "":
           set_channel_category(ctx.channel.name, new_categories)
 
-        print(f"[{channel_name}] Categories set to {get_channel_category(channel_name)}")
+        print(
+          f"[{channel_name}] Categories set to {get_channel_category(channel_name)}"
+        )
         await ctx.send(
-          f"Categories set to {get_channel_category(channel_name)} for {ctx.channel.name}.")
+          f"Categories set to {get_channel_category(channel_name)} for {ctx.channel.name}."
+        )
       else:
         category = get_channel_category(channel_name)
         await ctx.send(
@@ -568,7 +603,8 @@ class Bot(commands.Bot):
   @commands.command()
   async def help(self, ctx: commands.Context):
     await ctx.send(
-      "To view a list of commands/functionality, view the README here: https://bit.ly/45W9oLe")
+      "To view a list of commands/functionality, visit: https://itssport.co/twiviabot.html"
+    )
 
   @commands.command()
   async def announce(self, ctx: commands.Context):
