@@ -436,6 +436,15 @@ class Bot(commands.Bot):
       await ctx.send("A trivia question is already active!")
 
   @commands.command()
+  async def channels(self, ctx: commands.Context):
+    if ctx.author.name == 'itssport':
+      active_channels = sorted(get_saved_channels())
+      channels_message = "TwiviaBot exists in: "
+      for channel in active_channels:
+        channels_message += (f'{channel}, ')
+      await ctx.send(channels_message)
+
+  @commands.command()
   async def join(self, ctx: commands.Context):
     channel_name = ctx.author.name
     if ctx.channel.name == 'twiviabot':
