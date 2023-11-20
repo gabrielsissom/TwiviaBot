@@ -1,0 +1,144 @@
+
+[
+  { "question":"Who was the first featured character banner in genshin?",
+    "correct_answer":"Venti",
+    "difficulty":"Medium",
+    "category":"Genshin"
+  },
+  { "question":"What does Pyro resonance do?",
+    "correct_answer":"+25% atk",
+    "difficulty":"Easy",
+    "category":"Genshin"
+  },
+  { "question":"Who killed la signora?",
+    "correct_answer":"Raiden Shogun",
+    "difficulty":"Easy",
+    "category":"Genshin"
+  },
+  { "question":"Who is klees mother?",
+    "correct_answer":"Alice",
+    "difficulty":"Easy",
+    "category":"Genshin"
+  },
+  { "question":"What is fischls true name?",
+    "correct_answer":"Amy",
+    "difficulty":"Hard",
+    "category":"Genshin"
+  },
+  { "question":"How many fatui harbingers are there?",
+    "correct_answer":"12",
+    "difficulty":"Easy",
+    "category":"Genshin"
+  },
+  { "question":"What's the name of jeans burst?",
+    "correct_answer":"Dandelion Breeze",
+    "difficulty":"Medium",
+    "category":"Genshin"
+    
+  },
+  { "question":"What is the wanderers codename?",
+    "correct_answer":"Balladeer",
+    "difficulty":"Medium",
+    "category":"Genshin"
+  },
+  { "question":"What's Biazhus weapon called?",
+    "correct_answer":"Jadefall Splendor",
+    "difficulty":"Medium",
+    "category":"Genshin"
+  },
+  { "question":"True or False: Keqing is an adepti",
+    "correct_answer":"True",
+    "difficulty":"Easy",
+    "category":"Genshin"
+  },
+  { "question":"What is Beidous crew called?",
+  "correct_answer":"The Crux",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  }, 
+  { "question":"Is albedo human?",
+  "correct_answer":"No",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  }, 
+  { "question":"What patch did yelan come out?",
+  "correct_answer":"2.8",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  }, 
+  { "question":"What was the longest banner?",
+  "correct_answer":"Ayaka rerun",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  }, 
+  { "question":"First two characters on a double banner?",
+  "correct_answer":"Albedo and Eula",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  }, 
+  { "question":"Who had the fastest rerun?",
+  "correct_answer":"Yoimiya",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  }, 
+  { "question":"Which was the First event with lore?",
+  "correct_answer":"Unreconciled stars",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  }, 
+  { "question":"Where can you find skyfrost nail?",
+  "correct_answer":"Dragonspine and the Chasm",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  }, 
+  { "question":"Which nation worships lord barbatos?",
+  "correct_answer":"Mondtadt",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  }, 
+  { "question":"What nation does the Adventurer's Guild originate from?",
+  "correct_answer":"Snezhnaya",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  }, 
+  { "question":"How many primogems do you receive for completing the Character Test Run?",
+  "correct_answer":"20",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  }, 
+  { "question":"How many types of chests are there?",
+  "correct_answer":"5",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  }, 
+  { "question":"What reaction does Pyro and Electro make?",
+  "correct_answer":"Overload",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  }, 
+  { "question":"In which domain can players relive the battle against the fatui harbinger Childe?",
+  "correct_answer":"The Golden House",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  }, 
+  { "question":"How many crowns could you have given traveller from the start to now?",
+  "correct_answer":"16",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  }, 
+  { "question":"Who is the 3rd free character you recieve going through the story?",
+  "correct_answer":"Lisa",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  }, 
+  { "question":"How did teppei die?",
+  "correct_answer":"A fatui delusion",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  }, 
+  { "question":"How much atk did traveller gain from forbidden knowledge?",
+  "correct_answer":"3",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  }
+]

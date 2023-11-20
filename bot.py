@@ -44,7 +44,8 @@ CATEGORIES = {
   "COMICS": 29,
   "GADGETS": 30,
   "ANIME": 31,
-  "ANIMATION": 32
+  "ANIMATION": 32,
+  "GENSHIN" : 33
 }
 
 
@@ -213,16 +214,28 @@ class Bot(commands.Bot):
       if category in categories:
         cat_ids.append(CATEGORIES[category])
 
+
     if not 0 in cat_ids:
       id = random.choice(cat_ids)
       api_url = f"https://opentdb.com/api.php?amount=1&category={id}&type=multiple"
+
+    ## Genshin Trivia
+    if id == 33:
+      with open("genshin.json", "r") as read_file:
+        genshin_questions = json.load(read_file)
+      print("Data loaded: ")
+      print(genshin_questions)
+      question_data = random.choice(genshin_questions)
+      print("Question selected: ")
+      print(question_data)
+      return question_data
 
     response = requests.get(api_url)
 
     if response.status_code == requests.codes.ok:
       parsed_response = json.loads(response.text)
       question_data = parsed_response["results"]
-      return question_data
+      return question_data[0]
     else:
       print("Error:", response.status_code, response.text)
       return
@@ -347,7 +360,7 @@ class Bot(commands.Bot):
       # Checking for phrases banned in question and answer.
 
       while True:
-        question_data = self.get_question(channel_name)[0]
+        question_data = self.get_question(channel_name)
 
         question_contains_phrase = False
         for phrase in BANNED_IN_QUESTIONS:
