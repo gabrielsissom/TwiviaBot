@@ -214,20 +214,15 @@ class Bot(commands.Bot):
       if category in categories:
         cat_ids.append(CATEGORIES[category])
 
-
+    id = random.choice(cat_ids)
     if not 0 in cat_ids:
-      id = random.choice(cat_ids)
       api_url = f"https://opentdb.com/api.php?amount=1&category={id}&type=multiple"
 
     ## Genshin Trivia
     if id == 33:
       with open("genshin.json", "r") as read_file:
         genshin_questions = json.load(read_file)
-      print("Data loaded: ")
-      print(genshin_questions)
       question_data = random.choice(genshin_questions)
-      print("Question selected: ")
-      print(question_data)
       return question_data
 
     response = requests.get(api_url)
