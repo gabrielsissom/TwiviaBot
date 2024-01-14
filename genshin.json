@@ -5,6 +5,31 @@
     "difficulty":"Medium",
     "category":"Genshin"
   },
+  { "question":"Which Element has the most characters?",
+    "correct_answer":"Cryo",
+    "difficulty":"Medium",
+    "category":"Genshin"
+  },
+  { "question":"How many playable cryo characters are in the game as of 4.3",
+    "correct_answer":"15",
+    "difficulty":"Medium",
+    "category":"Genshin"
+  },
+  { "question":"What element and weapon combination is missing from the playable characters",
+    "correct_answer":"Hydro Claymore",
+    "difficulty":"Medium",
+    "category":"Genshin"
+  },
+  { "question":"Which Element has the least playable chara",
+    "correct_answer":"Geo and Dendro",
+    "difficulty":"Medium",
+    "category":"Genshin"
+  },
+  { "question":"What is the name of the 'umbrella' weapon?",
+    "correct_answer":"Toukabou Shigure",
+    "difficulty":"Medium",
+    "category":"Genshin"
+  },
   { "question":"What does Pyro resonance do?",
     "correct_answer":"+25% atk",
     "difficulty":"Easy",
@@ -15,33 +40,33 @@
     "difficulty":"Easy",
     "category":"Genshin"
   },
-  { "question":"Who is klees mother?",
+  { "question":"Who is Klees mother?",
     "correct_answer":"Alice",
     "difficulty":"Easy",
     "category":"Genshin"
   },
-  { "question":"What is fischls true name?",
+  { "question":"What is Fischls true name?",
     "correct_answer":"Amy",
     "difficulty":"Hard",
     "category":"Genshin"
   },
   { "question":"How many fatui harbingers are there?",
-    "correct_answer":"12",
+    "correct_answer":"11",
     "difficulty":"Easy",
     "category":"Genshin"
   },
-  { "question":"What's the name of jeans burst?",
+  { "question":"What's the name of Jeans burst?",
     "correct_answer":"Dandelion Breeze",
     "difficulty":"Medium",
     "category":"Genshin"
     
   },
-  { "question":"What is the wanderers codename?",
+  { "question":"What is the Wanderers codename?",
     "correct_answer":"Balladeer",
     "difficulty":"Medium",
     "category":"Genshin"
   },
-  { "question":"What's Biazhus weapon called?",
+  { "question":"What is Biazhus weapon called?",
     "correct_answer":"Jadefall Splendor",
     "difficulty":"Medium",
     "category":"Genshin"
@@ -56,8 +81,8 @@
   "difficulty":"Easy",
   "category":"Genshin"
   }, 
-  { "question":"Is albedo human?",
-  "correct_answer":"No",
+  { "question":"What is Albedo?",
+  "correct_answer":"A synthetic human",
   "difficulty":"Easy",
   "category":"Genshin"
   }, 
@@ -71,7 +96,12 @@
   "difficulty":"Hard",
   "category":"Genshin"
   }, 
-  { "question":"First two characters on a double banner?",
+  { "question":"How Long was Ayakas second banner",
+  "correct_answer":"42 days",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  }, 
+  { "question":"Who were the first two characters on a double banner?",
   "correct_answer":"Albedo and Eula",
   "difficulty":"Hard",
   "category":"Genshin"
@@ -86,12 +116,12 @@
   "difficulty":"Hard",
   "category":"Genshin"
   }, 
-  { "question":"Where can you find skyfrost nail?",
+  { "question":"Where can you find the skyfrost nails?",
   "correct_answer":"Dragonspine and the Chasm",
   "difficulty":"Medium",
   "category":"Genshin"
   }, 
-  { "question":"Which nation worships lord barbatos?",
+  { "question":"Which nation worships lord Barbatos?",
   "correct_answer":"Mondtadt",
   "difficulty":"Easy",
   "category":"Genshin"
@@ -116,8 +146,13 @@
   "difficulty":"Easy",
   "category":"Genshin"
   }, 
+  { "question":"What was the first weapon acquired from an event?",
+  "correct_answer":"Festering Desire",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  }, 
   { "question":"In which domain can players relive the battle against the fatui harbinger Childe?",
-  "correct_answer":"The Golden House",
+  "correct_answer":"Enter the Golden House",
   "difficulty":"Medium",
   "category":"Genshin"
   }, 
@@ -131,8 +166,28 @@
   "difficulty":"Medium",
   "category":"Genshin"
   }, 
-  { "question":"How did teppei die?",
+  { "question":"Who is the 2nd free character you recieve going through the story?",
+  "correct_answer":"kaeya",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  }, 
+  { "question":"Who is the first character the traveller sees in their journey excluding Paimon",
+  "correct_answer":"Venti",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  }, 
+  { "question":"How did Teppei die?",
   "correct_answer":"A fatui delusion",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  }, 
+  { "question":"What region has the longest archon quest",
+  "correct_answer":"Sumeru",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  }, 
+  { "question":"Where is Dainsleif from?",
+  "correct_answer":"Khaenri'ah",
   "difficulty":"Medium",
   "category":"Genshin"
   }, 
