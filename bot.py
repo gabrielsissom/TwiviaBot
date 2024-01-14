@@ -1,11 +1,14 @@
-import os, random, asyncio, html, json, sqlite3, time, requests
+import os, random, asyncio, html, json, psycopg2, time, requests
 from twitchio.ext import commands
 from difflib import SequenceMatcher
 
 #GLOBAL CONSTANTS
+DATABASE_URL = os.environ['DATABASE_URL']
+
+#GLOBAL SETTINGS
 HINT_CHARS_REVEALED = 0.4  # Scale between 0.0 and 1.0 where 1 reveals 100% of the answer.
 TIME_BEFORE_HINT = 20  # Seconds before a hint is given.
-TIME_BEFORE_ANSWER = 10  # Seconds (after hint is given) before the answer is revealed.
+TIME_BEFORE_ANSWER = 15  # Seconds (after hint is given) before the answer is revealed.
 ANSWER_CLOSE = 0.8  # Scale between 0.0 and 1.0 where 1.0 is an exact match. Announces that a user is close to the correct answer.
 ANSWER_CORRECTNESS = 0.9  # Scale between 0.0 and 1.0 where 1.0 is an exact match.
 CORRECT_ANSWER_VALUE = 1  # Number of points to award for a correct question.
@@ -48,9 +51,11 @@ CATEGORIES = {
   "GENSHIN" : 33
 }
 
+def get_db_connection():
+  return psycopg2.connect(DATABASE_URL)
 
 def setup_db():
-  conn = sqlite3.connect('channel_data.db')
+  conn = get_db_connection()
   c = conn.cursor()
 
   c.execute('''CREATE TABLE IF NOT EXISTS channels (
@@ -82,109 +87,130 @@ def setup_db():
 
 
 def get_saved_channels():
-  conn = sqlite3.connect('channel_data.db')
+  conn = get_db_connection()
   c = conn.cursor()
   c.execute('SELECT name FROM channels')
   result = c.fetchall()
+  c.close()
   conn.close()
   return [channel[0] for channel in result]
 
 
 def get_top_users(channel_name, limit=5):
-  conn = sqlite3.connect('channel_data.db')
+  conn = get_db_connection()
   c = conn.cursor()
   c.execute(
-    'SELECT username, score FROM users WHERE channel = ? ORDER BY score DESC LIMIT ?',
+    'SELECT username, score FROM users WHERE channel = %s ORDER BY score DESC LIMIT %s',
     (channel_name, limit))
   result = c.fetchall()
+  c.close()
   conn.close()
   return result
 
 
 def get_channel_cooldown(channel_name):
-  conn = sqlite3.connect('channel_data.db')
+  conn = get_db_connection()
   c = conn.cursor()
-  c.execute('SELECT cooldown FROM channel_cooldowns WHERE channel = ?',
+  c.execute('SELECT cooldown FROM channel_cooldowns WHERE channel = %s',
             (channel_name, ))
   result = c.fetchone()
+  c.close()
   conn.close()
   return result[0] if result else 30  # Default cooldown is 30 seconds
 
 
 def set_channel_cooldown(channel_name, cooldown):
-  conn = sqlite3.connect('channel_data.db')
+  conn = get_db_connection()
   c = conn.cursor()
   c.execute(
-    'INSERT OR REPLACE INTO channel_cooldowns (channel, cooldown) VALUES (?, ?)',
+    '''
+    INSERT INTO channel_cooldowns (channel, cooldown) 
+    VALUES (%s, %s) 
+    ON CONFLICT (channel) 
+    DO UPDATE SET cooldown = EXCLUDED.cooldown
+    ''',
     (channel_name, cooldown))
   conn.commit()
+  c.close()
   conn.close()
 
 
 def set_channel_category(channel_name, category):
-  conn = sqlite3.connect('channel_data.db')
+  conn = get_db_connection()
   c = conn.cursor()
   c.execute(
-    'INSERT OR REPLACE INTO channel_categories (channel, category) VALUES (?, ?)',
+    '''
+    INSERT INTO channel_categories (channel, category) 
+    VALUES (%s, %s) 
+    ON CONFLICT (channel) 
+    DO UPDATE SET category = EXCLUDED.category
+    ''',
     (channel_name, category))
   conn.commit()
+  c.close()
   conn.close()
 
 
 def get_channel_category(channel_name):
-  conn = sqlite3.connect('channel_data.db')
+  conn = get_db_connection()
   c = conn.cursor()
-  c.execute('SELECT category FROM channel_categories WHERE channel = ?',
+  c.execute('SELECT category FROM channel_categories WHERE channel = %s',
             (channel_name, ))
   result = c.fetchone()
+  c.close()
   conn.close()
   return result[0] if result else 'ALL'  # Default cooldown is 30 seconds
 
 
 def add_channel(channel_name):
-  conn = sqlite3.connect('channel_data.db')
+  conn = get_db_connection()
   c = conn.cursor()
-  c.execute('INSERT OR IGNORE INTO channels (name) VALUES (?)',
-            (channel_name, ))
+  c.execute('INSERT INTO channels (name) VALUES (%s) ON CONFLICT (name) DO NOTHING',
+          (channel_name,))
   conn.commit()
+  c.close()
   conn.close()
 
 
 def remove_channel(channel_name):
-  conn = sqlite3.connect('channel_data.db')
+  conn = get_db_connection()
   c = conn.cursor()
-  c.execute('DELETE FROM channels WHERE name = ?', (channel_name, ))
+  c.execute('DELETE FROM channels WHERE name = %s', (channel_name, ))
   conn.commit()
+  c.close()
   conn.close()
 
 
 def reset_scores(channel_name):
-  conn = sqlite3.connect('channel_data.db')
+  conn = get_db_connection()
   c = conn.cursor()
-  c.execute('DELETE FROM users WHERE channel = ?', (channel_name, ))
+  c.execute('DELETE FROM users WHERE channel = %s', (channel_name, ))
   conn.commit()
+  c.close()
   conn.close()
 
 
 def add_score(channel_name, username, points):
-  conn = sqlite3.connect('channel_data.db')
+  conn = get_db_connection()
   c = conn.cursor()
   c.execute(
-    'INSERT OR IGNORE INTO users (username, channel, score) VALUES (?, ?, ?)',
+    'INSERT INTO users (username, channel, score) VALUES (%s, %s, %s) ON CONFLICT DO NOTHING',
     (username, channel_name, 0))
   c.execute(
-    'UPDATE users SET score = score + ? WHERE username = ? AND channel = ?',
+    'UPDATE users SET score = score + %s WHERE username = %s AND channel = %s',
     (points, username, channel_name))
   conn.commit()
+  c.close()
   conn.close()
 
 
 def get_score(channel_name, username):
-  conn = sqlite3.connect('channel_data.db')
+  conn = get_db_connection()
   c = conn.cursor()
-  c.execute('SELECT score FROM users WHERE username = ? AND channel = ?',
+  c.execute('SELECT score FROM users WHERE username = %s AND channel = %s',
             (username, channel_name))
   result = c.fetchone()
+  c.close()
   conn.close()
   return result[0] if result else 0
 
@@ -206,7 +232,7 @@ class Bot(commands.Bot):
     self.current_question = None
     self.channels = channels
 
-  def get_question(self, channel_name):
+  async def get_question(self, channel_name):
     api_url = 'https://opentdb.com/api.php?amount=1&type=multiple'
     categories = get_channel_category(channel_name)
     cat_ids = []
@@ -225,15 +251,27 @@ class Bot(commands.Bot):
       question_data = random.choice(genshin_questions)
       return question_data
 
-    response = requests.get(api_url)
+    got_question = False
+    max_tries = 0
 
-    if response.status_code == requests.codes.ok:
-      parsed_response = json.loads(response.text)
-      question_data = parsed_response["results"]
-      return question_data[0]
-    else:
-      print("Error:", response.status_code, response.text)
-      return
+    while (not got_question) and (max_tries < 3):
+      response = requests.get(api_url)
+      if response.status_code == requests.codes.ok:
+        got_question = True
+      else:
+        if max_tries < 3:
+          print("Error:", response.status_code, response.text)
+          print(f"Retrying... ({max_tries + 1} of 3)")
+          max_tries += 1
+          await asyncio.sleep(max_tries + 2)
+          
+        else:
+          print("API failure: Question failed.")
+
+    parsed_response = json.loads(response.text)
+    question_data = parsed_response["results"]
+    return question_data[0]
+    
 
   def format_question(self, question):
     formatted_question = html.unescape(question['question'])
@@ -355,7 +393,7 @@ class Bot(commands.Bot):
       # Checking for phrases banned in question and answer.
 
       while True:
-        question_data = self.get_question(channel_name)
+        question_data = await self.get_question(channel_name)
 
         question_contains_phrase = False
         for phrase in BANNED_IN_QUESTIONS:
