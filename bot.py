@@ -232,10 +232,19 @@ class Bot(commands.Bot):
     self.current_question = None
     self.channels = channels
 
-  async def get_question(self, channel_name):
+  async def get_question(self, channel_name, precategory = None):
     api_url = 'https://opentdb.com/api.php?amount=1&type=multiple'
-    categories = get_channel_category(channel_name)
     cat_ids = []
+    categories = ''
+    
+    if precategory != None:
+      if precategory.upper() in CATEGORIES:
+        categories = precategory.upper()
+      else:
+        categories = get_channel_category(channel_name)
+    else:
+      categories = get_channel_category(channel_name)
+      
     for category in CATEGORIES:
       if category in categories:
         cat_ids.append(CATEGORIES[category])
@@ -370,7 +379,7 @@ class Bot(commands.Bot):
     await self.handle_commands(message)
 
   @commands.command()
-  async def trivia(self, ctx: commands.Context):
+  async def trivia(self, ctx: commands.Context, cat: str = None):
     channel_name = ctx.channel.name
     channel_state = self.get_channel_state(channel_name)
     if 'last_trivia' not in channel_state:
@@ -393,7 +402,11 @@ class Bot(commands.Bot):
       # Checking for phrases banned in question and answer.
 
       while True:
-        question_data = await self.get_question(channel_name)
+        if not cat == None:
+          question_data = await self.get_question(channel_name, cat)
+        else:
+          question_data = await self.get_question(channel_name)
+          
 
         question_contains_phrase = False
         for phrase in BANNED_IN_QUESTIONS:

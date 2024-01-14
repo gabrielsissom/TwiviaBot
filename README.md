@@ -15,6 +15,7 @@ A trivia game bot for your Twitch chat. To get started, visit [TwiviaBot's chann
  - Does **not** remove points, leaderboard, or cooldown settings.
 
 ### %trivia - Starts a trivia game in the channel.
+- Optional: `%trivia [category]`
 - A trivia game may be started by any channel member.
 - Answers to trivia questions must be above a 90% match to be counted as correct.
 - Answers to trivia questions above an 80% match will be announced as 'close'.
