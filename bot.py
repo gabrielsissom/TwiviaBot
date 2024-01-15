@@ -1,9 +1,11 @@
 import os, random, asyncio, html, json, psycopg2, time, requests
 from twitchio.ext import commands
 from difflib import SequenceMatcher
+import discord
 
 #GLOBAL CONSTANTS
 DATABASE_URL = os.environ['DATABASE_URL']
+DISCORD_WEBHOOK_URL = os.environ['DISCORD_WEBHOOK_URL']
 
 #GLOBAL SETTINGS
 HINT_CHARS_REVEALED = 0.4  # Scale between 0.0 and 1.0 where 1 reveals 100% of the answer.
@@ -48,11 +50,13 @@ CATEGORIES = {
   "GADGETS": 30,
   "ANIME": 31,
   "ANIMATION": 32,
-  "GENSHIN" : 33
+  "GENSHIN": 33
 }
+
 
 def get_db_connection():
   return psycopg2.connect(DATABASE_URL)
+
 
 def setup_db():
   conn = get_db_connection()
@@ -82,14 +86,32 @@ def setup_db():
                  FOREIGN KEY (channel) REFERENCES channels (name)
              )''')
 
+  c.execute(
+    '''ALTER TABLE channels ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE'''
+  )
+
   conn.commit()
   conn.close()
+
+
+def discord_log(message):
+  payload = {
+    'content': message,
+    'username': 'TwiviaBot',
+    'avatar_url': 'https://i.imgur.com/3qA9RkH.png'
+  }
+  response = requests.post(DISCORD_WEBHOOK_URL, json=payload)
+  print(f"[{response.status_code}] {response.text}")
+  return
 
 
 def get_saved_channels():
   conn = get_db_connection()
   c = conn.cursor()
-  c.execute('SELECT name FROM channels')
+  # Select only active channels.
+  c.execute('''
+      SELECT name FROM channels WHERE is_active = TRUE
+  ''')
   result = c.fetchall()
   c.close()
   conn.close()
@@ -128,8 +150,7 @@ def set_channel_cooldown(channel_name, cooldown):
     VALUES (%s, %s) 
     ON CONFLICT (channel) 
     DO UPDATE SET cooldown = EXCLUDED.cooldown
-    ''',
-    (channel_name, cooldown))
+    ''', (channel_name, cooldown))
   conn.commit()
   c.close()
   conn.close()
@@ -144,8 +165,7 @@ def set_channel_category(channel_name, category):
     VALUES (%s, %s) 
     ON CONFLICT (channel) 
     DO UPDATE SET category = EXCLUDED.category
-    ''',
-    (channel_name, category))
+    ''', (channel_name, category))
   conn.commit()
   c.close()
   conn.close()
@@ -165,8 +185,12 @@ def get_channel_category(channel_name):
 def add_channel(channel_name):
   conn = get_db_connection()
   c = conn.cursor()
-  c.execute('INSERT INTO channels (name) VALUES (%s) ON CONFLICT (name) DO NOTHING',
-          (channel_name,))
+  # Re-activate if the channel has been added back.
+  c.execute(
+    '''
+      INSERT INTO channels (name) VALUES (%s)
+      ON CONFLICT (name) DO UPDATE SET is_active = TRUE
+  ''', (channel_name, ))
   conn.commit()
   c.close()
   conn.close()
@@ -175,7 +199,11 @@ def add_channel(channel_name):
 def remove_channel(channel_name):
   conn = get_db_connection()
   c = conn.cursor()
-  c.execute('DELETE FROM channels WHERE name = %s', (channel_name, ))
+  # Soft delete: Set is_active to FALSE instead of deleting.
+  c.execute(
+    '''
+      UPDATE channels SET is_active = FALSE WHERE name = %s
+  ''', (channel_name, ))
   conn.commit()
   c.close()
   conn.close()
@@ -232,11 +260,11 @@ class Bot(commands.Bot):
     self.current_question = None
     self.channels = channels
 
-  async def get_question(self, channel_name, precategory = None):
+  async def get_question(self, channel_name, precategory=None):
     api_url = 'https://opentdb.com/api.php?amount=1&type=multiple'
     cat_ids = []
     categories = ''
-    
+
     if precategory != None:
       if precategory.upper() in CATEGORIES:
         categories = precategory.upper()
@@ -244,7 +272,7 @@ class Bot(commands.Bot):
         categories = get_channel_category(channel_name)
     else:
       categories = get_channel_category(channel_name)
-      
+
     for category in CATEGORIES:
       if category in categories:
         cat_ids.append(CATEGORIES[category])
@@ -269,18 +297,19 @@ class Bot(commands.Bot):
         got_question = True
       else:
         if max_tries < 3:
-          print("Error:", response.status_code, response.text)
-          print(f"Retrying... ({max_tries + 1} of 3)")
+          discord_log(
+            f"[{channel_name}] Error: {response.status_code} | {response.text}"
+          )
+          discord_log(f"[{channel_name}] Retrying... ({max_tries + 1} of 3)")
           max_tries += 1
           await asyncio.sleep(max_tries + 2)
-          
+
         else:
-          print("API failure: Question failed.")
+          discord_log(f"[{channel_name}]API failure: Question failed.")
 
     parsed_response = json.loads(response.text)
     question_data = parsed_response["results"]
     return question_data[0]
-    
 
   def format_question(self, question):
     formatted_question = html.unescape(question['question'])
@@ -322,7 +351,7 @@ class Bot(commands.Bot):
           else:
             hint += '_'  # Add space between each character
 
-        print(f"[{ctx.channel.name}] Hint generated: {hint.strip()}")
+        discord_log(f"[{ctx.channel.name}] Hint generated: {hint.strip()}")
         await ctx.send("Hint: " + hint.strip())
     try:
       await asyncio.wait_for(self.wait_for_answer(ctx),
@@ -332,7 +361,7 @@ class Bot(commands.Bot):
           'current_question']:  # If the question hasn't been answered yet
         await ctx.send("Time's up! The correct answer was: " +
                        channel_state['current_question']["answer"])
-        print(
+        discord_log(
           f"[{ctx.channel.name}] Time Up | A: {channel_state['current_question']['answer']}"
         )
         channel_state['current_question'] = None
@@ -343,8 +372,8 @@ class Bot(commands.Bot):
       await asyncio.sleep(1)
 
   async def event_ready(self):
-    print(f'Logged in as | {self.nick}')
-    print(f'User id is | {self.user_id}')
+    discord_log(f'Logged in as | {self.nick}')
+    discord_log(f'User id is | {self.user_id}')
 
   async def event_message(self, message):
     if message.echo:
@@ -368,7 +397,7 @@ class Bot(commands.Bot):
       user = message.author.name
       channel = message.channel.name
       add_score(channel, user, CORRECT_ANSWER_VALUE)
-      print(
+      discord_log(
         f"[{channel}] {user} answered with {similarity(user_answer, correct_answer)} accuracy."
       )
       await message.channel.send(
@@ -406,12 +435,11 @@ class Bot(commands.Bot):
           question_data = await self.get_question(channel_name, cat)
         else:
           question_data = await self.get_question(channel_name)
-          
 
         question_contains_phrase = False
         for phrase in BANNED_IN_QUESTIONS:
           if phrase in question_data["question"].upper():
-            print(
+            discord_log(
               f"[{channel_name}] Question contained '{phrase}'; Generating new question."
             )
             question_contains_phrase = True
@@ -420,7 +448,7 @@ class Bot(commands.Bot):
         answer_contains_phrase = False
         for phrase in BANNED_IN_ANSWER:
           if phrase in question_data["correct_answer"].upper():
-            print(
+            discord_log(
               f"[{channel_name}] Answer contained '{phrase}'; Generating new question."
             )
             answer_contains_phrase = True
@@ -430,7 +458,7 @@ class Bot(commands.Bot):
         # be compared to the question with .upper()
         question_contains_NOT = False
         if "NOT" in question_data["question"]:
-          print(
+          discord_log(
             f"[{channel_name}] Question contained 'NOT'; Generating new question."
           )
           question_contains_NOT = True
@@ -438,7 +466,7 @@ class Bot(commands.Bot):
         if not question_contains_phrase and not answer_contains_phrase and not question_contains_NOT:
           break
         else:
-          print(
+          discord_log(
             f"[{channel_name}] BANNED PHRASES IN (Q: {question_data['question']} A: {question_data['correct_answer']})"
           )
 
@@ -452,14 +480,14 @@ class Bot(commands.Bot):
       }
 
       if "(" in channel_state['current_question']["answer"]:
-        print(
+        discord_log(
           f"[{ctx.channel.name}] Removing Parentheses From: {channel_state['current_question']['answer']}"
         )
         channel_state['current_question']["answer"] = channel_state[
           'current_question'][
             "answer"][:channel_state['current_question']["answer"].index("(")]
 
-      print(
+      discord_log(
         f"[{ctx.channel.name}] Trivia Game Started by {ctx.author.name} [category: "
         + channel_state['current_question']['category'] + "]: Q: " +
         channel_state['current_question']["question"] + " A: " +
@@ -474,7 +502,7 @@ class Bot(commands.Bot):
           'current_question']:  # If the question hasn't been answered yet
         await ctx.send("Time's up! The correct answer was: " +
                        channel_state['current_question']["answer"])
-        print(
+        discord_log(
           f"[{ctx.channel.name}] Time Up | A: {channel_state['current_question']['answer']}"
         )
         channel_state['current_question'] = None
@@ -498,7 +526,7 @@ class Bot(commands.Bot):
         await self.join_channels([channel_name])
         self.channels.append(channel_name)
         add_channel(channel_name)
-        print(f"TwiviaBot has joined channel {channel_name}.")
+        discord_log(f"TwiviaBot has joined channel {channel_name}.")
         await ctx.send(
           f"Twivia bot has joined channel {channel_name}. Make sure to /mod TwiviaBot."
         )
@@ -514,7 +542,7 @@ class Bot(commands.Bot):
         await self.join_channels([channel_name])
         self.channels.append(channel_name)
         add_channel(channel_name)
-        print(f"TwiviaBot has joined channel {channel_name}.")
+        discord_log(f"TwiviaBot has joined channel {channel_name}.")
         await ctx.send(
           f"Twivia bot has joined channel {channel_name}. Make sure to /mod TwiviaBot."
         )
@@ -529,7 +557,7 @@ class Bot(commands.Bot):
         await self.part_channels([channel_name])
         self.channels.remove(channel_name)
         remove_channel(channel_name)
-        print(f"TwiviaBot has left channel {channel_name}.")
+        discord_log(f"TwiviaBot has left channel {channel_name}.")
         await ctx.send(f"TwiviaBot has left channel {channel_name}.")
       else:
         await ctx.send(f"Channel {channel_name} not found in the list.")
@@ -540,9 +568,12 @@ class Bot(commands.Bot):
   async def forcepart(self, ctx: commands.Context, channel_name: str = None):
     if ctx.author.name == 'itssport' and not channel_name == None:
       await self.part_channels([channel_name])
-      self.channels.remove(channel_name)
+      try:
+        self.channels.remove(channel_name)
+      except:
+        print(f"Channel {channel_name} not found in the list.")
       remove_channel(channel_name)
-      print(f"TwiviaBot has left channel {channel_name}.")
+      discord_log(f"TwiviaBot has left channel {channel_name}.")
       await ctx.send(f"TwiviaBot has left channel {channel_name}.")
 
   @commands.command()
@@ -565,7 +596,8 @@ class Bot(commands.Bot):
       if not channel_state['current_question'] == None:
         await ctx.send('Question skipped. A: ' +
                        channel_state['current_question']["answer"])
-        print(f"[{ctx.channel.name}] Question skipped by {ctx.author.name}")
+        discord_log(
+          f"[{ctx.channel.name}] Question skipped by {ctx.author.name}")
         channel_state['current_question'] = None
     else:
       await ctx.send("You must be a moderator to use this command.")
@@ -633,7 +665,7 @@ class Bot(commands.Bot):
           new_categories = "ALL"
           invalid_categories = ""
 
-        print(new_categories)
+        discord_log(f"[{ctx.channel.name}] Category update: {new_categories}")
 
         if not invalid_categories == "":
           await ctx.send(
@@ -642,7 +674,7 @@ class Bot(commands.Bot):
         if not new_categories == "":
           set_channel_category(ctx.channel.name, new_categories)
 
-        print(
+        discord_log(
           f"[{channel_name}] Categories set to {get_channel_category(channel_name)}"
         )
         await ctx.send(
@@ -681,6 +713,7 @@ class Bot(commands.Bot):
       for channel_name in self.channels:
         channel = self.get_channel(channel_name)
         await channel.send(f"[ANNOUNCEMENT] {announcement}")
+        discord_log(f"[ANNOUNCEMENT] {announcement}")
       await ctx.send("Announcement sent to all channels.")
     else:
       await ctx.send("You do not have permission to perform this command.")
@@ -692,7 +725,7 @@ def main():
   if 'twiviabot' not in channels:
     add_channel('twiviabot')
     channels = get_saved_channels()
-    print("twiviabot not found in channels list on boot, re-added.")
+    discord_log("twiviabot not found in channels list on boot, re-added.")
   twiviaBot = Bot(channels)
   twiviaBot.run()
 

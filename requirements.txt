@@ -1,3 +1,4 @@
 twitchio
 requests
 psycopg2
+discord.py
