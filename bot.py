@@ -90,6 +90,10 @@ def setup_db():
     '''ALTER TABLE channels ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE'''
   )
 
+  c.execute(
+    '''ALTER TABLE channels ADD COLUMN IF NOT EXISTS is_premium BOOLEAN NOT NULL DEFAULT FALSE'''
+  )
+
   conn.commit()
   conn.close()
 
@@ -111,6 +115,19 @@ def get_saved_channels():
   # Select only active channels.
   c.execute('''
       SELECT name FROM channels WHERE is_active = TRUE
+  ''')
+  result = c.fetchall()
+  c.close()
+  conn.close()
+  return [channel[0] for channel in result]
+
+
+def get_premium_channels():
+  conn = get_db_connection()
+  c = conn.cursor()
+  # Select only active channels.
+  c.execute('''
+      SELECT name FROM channels WHERE is_premium = TRUE
   ''')
   result = c.fetchall()
   c.close()
@@ -203,6 +220,32 @@ def remove_channel(channel_name):
   c.execute(
     '''
       UPDATE channels SET is_active = FALSE WHERE name = %s
+  ''', (channel_name, ))
+  conn.commit()
+  c.close()
+  conn.close()
+
+
+def add_premium(channel_name):
+  conn = get_db_connection()
+  c = conn.cursor()
+  # Re-activate if the channel has been added back.
+  c.execute(
+    '''
+      INSERT INTO channels (name) VALUES (%s)
+      ON CONFLICT (name) DO UPDATE SET is_premium = TRUE
+  ''', (channel_name, ))
+  conn.commit()
+  c.close()
+  conn.close()
+
+
+def remove_premium(channel_name):
+  conn = get_db_connection()
+  c = conn.cursor()
+  c.execute(
+    '''
+      UPDATE channels SET is_premium = FALSE WHERE name = %s
   ''', (channel_name, ))
   conn.commit()
   c.close()
@@ -517,6 +560,30 @@ class Bot(commands.Bot):
       for channel in active_channels:
         channels_message += (f'{channel}, ')
       await ctx.send(channels_message)
+
+  @commands.command()
+  async def sub(self, ctx: commands.Context, channel_name: str = None):
+    if (ctx.author.name == 'itssport'):
+      if channel_name not in get_premium_channels():
+        add_premium(channel_name)
+        discord_log(f"[{channel_name}] Added to premium channels.")
+        await ctx.send(f"Channel {channel_name} is now premium.")
+      else:
+        await ctx.send(f"Channel {channel_name} is already premium.")
+    else:
+      await ctx.send("You do not have permission to use this command.")
+
+  @commands.command()
+  async def unsub(self, ctx: commands.Context, channel_name: str = None):
+    if (ctx.author.name == 'itssport'):
+      if channel_name in get_premium_channels():
+        remove_premium(channel_name)
+        discord_log(f"[{channel_name}] Removed from premium channels.")
+        await ctx.send(f"Channel {channel_name} is no longer premium.")
+      else:
+        await ctx.send(f"Channel {channel_name} is not premium.")
+    else:
+      await ctx.send("You do not have permission to use this command.")
 
   @commands.command()
   async def join(self, ctx: commands.Context):
