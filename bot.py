@@ -789,8 +789,8 @@ class Bot(commands.Bot):
       for channel_name in self.channels:
         channel = self.get_channel(channel_name)
         await channel.send(f"[ANNOUNCEMENT] {announcement}")
-        discord_log(f"[ANNOUNCEMENT] {announcement}")
       await ctx.send("Announcement sent to all channels.")
+      discord_log("Announcement sent to all channels.")
     else:
       await ctx.send("You do not have permission to perform this command.")
 
