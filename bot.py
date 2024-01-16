@@ -100,7 +100,7 @@ def setup_db():
 
 def discord_log(message):
   payload = {
-    'content': message,
+    'content': f"```{message}```",
     'username': 'TwiviaBot',
     'avatar_url': 'https://i.imgur.com/3qA9RkH.png'
   }
@@ -348,7 +348,8 @@ class Bot(commands.Bot):
           await asyncio.sleep(max_tries + 2)
 
         else:
-          discord_log(f"[{channel_name}]API failure: Question failed.")
+          discord_log(f"[{channel_name}] API failure: Question failed.")
+          return None
 
     parsed_response = json.loads(response.text)
     question_data = parsed_response["results"]
@@ -357,8 +358,11 @@ class Bot(commands.Bot):
   def format_question(self, question):
     formatted_question = html.unescape(question['question'])
     formatted_answer = html.unescape(question['correct_answer'])
+    formatted_category = html.unescape(question['category'])
     question['question'] = formatted_question
     question['correct_answer'] = formatted_answer
+    question['category'] = formatted_category
+    return question
     return question
 
   def get_channel_state(self, channel_name):
@@ -478,6 +482,11 @@ class Bot(commands.Bot):
           question_data = await self.get_question(channel_name, cat)
         else:
           question_data = await self.get_question(channel_name)
+
+        if question_data == None:
+          discord_log(f"[{channel_name}] API failure: Question failed.")
+          await ctx.send("Trivia API failed. Try again.")
+          return
 
         question_contains_phrase = False
         for phrase in BANNED_IN_QUESTIONS:
