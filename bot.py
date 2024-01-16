@@ -17,7 +17,7 @@ CORRECT_ANSWER_VALUE = 1  # Number of points to award for a correct question.
 BOT_PREFIX = '%'  # Token required before each command
 
 BANNED_IN_QUESTIONS = [
-  "WHICH OF", "WHICH ONE OF", "THE FOLLOWING", "OUT OF THESE"
+  "WHICH OF", "WHICH ONE OF", "OF THE FOLLOWING", "OUT OF THESE"
 ]
 
 BANNED_IN_ANSWER = ["ALL OF THE ABOVE"]
@@ -334,7 +334,7 @@ class Bot(commands.Bot):
     got_question = False
     max_tries = 0
 
-    while (not got_question) and (max_tries < 3):
+    while (not got_question) and (max_tries < 4):
       response = requests.get(api_url)
       if response.status_code == requests.codes.ok:
         got_question = True
