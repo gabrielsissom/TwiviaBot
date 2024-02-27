@@ -195,5 +195,156 @@
   "correct_answer":"3",
   "difficulty":"Hard",
   "category":"Genshin"
+  },
+  { "question":"Who was the first Dendro Archon?",
+  "correct_answer":"Greater Lord Rukkhadevata",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  }, 
+  { "question":"What quantity of a local specialty does a character need to reach level 90?",
+  "correct_answer":"168",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What is the name of the world inside Raiden Ei's mind?",
+  "correct_answer":"The Plane of Euthymia",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Who is the only character in the game that uses dendrobiums for ascension?",
+  "correct_answer":"Kujou Sara",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Who was the first character with the ability to perform a mid-air elemental skill?",
+  "correct_answer":"Xiao",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+
+  { "question":"What are the two opposing energies that the Arkhe system is composed of?",
+  "correct_answer":"Pneuma and Ousia ",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Who is Childe's master?",
+  "correct_answer":"Skirk",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Who was the first male electro character released after Razor?",
+  "correct_answer":"Cyno",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What is the highest crit rate % an artifact can have as a substat?",
+  "correct_answer":"23.4",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What item is required to level up a talent to its max?",
+  "correct_answer":"Crown of Insight",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Who is the only four-star character that has a close up cut-in during their elemental burst?",
+  "correct_answer":"Barbara",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which weapon is not wielded by any Archon so far?",
+  "correct_answer":"Claymore",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Where is Chiori from?",
+  "correct_answer":"Inazuma",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Who is known as the Star of Zubayr Theatre",
+  "correct_answer":"Nilou",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which group of weapons have a chance to reset a character's skill cooldown?",
+  "correct_answer":"Sacrificial",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What is the highest base atk on any weapon?",
+  "correct_answer":"741",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which character has the highest base ATK",
+  "correct_answer":"Xiao",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What Character Level-Up Material does Rhodeia of Loch drop?",
+  "correct_answer":"Cleansing Heart",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What is the most expensive item one can purchase from Tubby?",
+  "correct_answer":"Transient Resin",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"How much adeptal energy is needed to max out Realm currency acumulation rate",
+  "correct_answer":"20000",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"How much realm currency can be accululated per hour",
+  "correct_answer":"30",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which elite enemy drops Chilled Meat",
+  "correct_answer":"The Great Snowboar King",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"The Black Serpents are exclusive to which region of the map?",
+  "correct_answer":"The Chasm: Underground Mines",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Where is The Knave from?",
+  "correct_answer":"Fontaine",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What is the cost of a four-star character in Paimon's Bargains?",
+  "correct_answer":"34 Masterless Starglitter",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"How many weapons can be found through exploration alone",
+  "correct_answer":"11",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What is the most common local specialty?",
+  "correct_answer":"Violet Grass",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What is the least common local specialty?",
+  "correct_answer":"Silk flowers",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"When is co-op unlocked?",
+  "correct_answer":"AR 16",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"How many sides does the dice in Genius invokation TCG have?",
+  "correct_answer":"8",
+  "difficulty":"Easy",
+  "category":"Genshin"
   }
 ]
