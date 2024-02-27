@@ -427,29 +427,27 @@ class Bot(commands.Bot):
       return
 
     channel_state = self.get_channel_state(message.channel.name)
-    user_answer = message.content.strip().lower()
-    correct_answer = channel_state['current_question']['answer'].lower(
-    ) if channel_state['current_question'] else None
+    if channel_state['current_question']:
+      user_answer = message.content.strip().lower()
+      correct_answer = channel_state['current_question']['answer'].lower(
+      ) if channel_state['current_question'] else None
 
-    if ((channel_state['current_question'])
-        and (similarity(user_answer, correct_answer) >= ANSWER_CLOSE)
-        and (similarity(user_answer, correct_answer) < ANSWER_CORRECTNESS)):
-      user = message.author.name
-      await message.channel.send(
-        f"{user} is close! {round(similarity(user_answer, correct_answer) * 100, 2)}% accurate."
-      )
+      if (similarity(user_answer, correct_answer) >= ANSWER_CLOSE) and (similarity(user_answer, correct_answer) < ANSWER_CORRECTNESS):
+        user = message.author.name
+        await message.channel.send(
+          f"{user} is close! {round(similarity(user_answer, correct_answer) * 100, 2)}% accurate."
+        )
 
-    if channel_state['current_question'] and similarity(
-        user_answer, correct_answer) >= ANSWER_CORRECTNESS:
-      user = message.author.name
-      channel = message.channel.name
-      add_score(channel, user, CORRECT_ANSWER_VALUE)
-      discord_log(
-        f"[{channel}] {user} answered with {similarity(user_answer, correct_answer)} accuracy."
-      )
-      await message.channel.send(
-        f"{user} answered with {round(similarity(user_answer, correct_answer) * 100, 2)}% accuracy! Their score is now {get_score(channel, user)}. Answer: {channel_state['current_question']['answer']}"
-      )
+      if similarity(user_answer, correct_answer) >= ANSWER_CORRECTNESS:
+        user = message.author.name
+        channel = message.channel.name
+        add_score(channel, user, CORRECT_ANSWER_VALUE)
+        discord_log(
+          f"[{channel}] {user} answered with {similarity(user_answer, correct_answer)} accuracy."
+        )
+        await message.channel.send(
+          f"{user} answered with {round(similarity(user_answer, correct_answer) * 100, 2)}% accuracy! Their score is now   {get_score(channel, user)}. Answer: {channel_state['current_question']['answer']}"
+        )
       channel_state['current_question'] = None
 
     await self.handle_commands(message)
