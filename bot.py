@@ -15,6 +15,7 @@ ANSWER_CLOSE = 0.8  # Scale between 0.0 and 1.0 where 1.0 is an exact match. Ann
 ANSWER_CORRECTNESS = 0.9  # Scale between 0.0 and 1.0 where 1.0 is an exact match.
 CORRECT_ANSWER_VALUE = 1  # Number of points to award for a correct question.
 BOT_PREFIX = '%'  # Token required before each command
+MAX_API_TRIES = 3  # Number of times to try getting a question set before giving up.
 
 BANNED_IN_QUESTIONS = [
   "WHICH OF", "WHICH ONE OF", "OF THE FOLLOWING", "OUT OF THESE"
@@ -315,10 +316,11 @@ class Bot(commands.Bot):
     self.channels = channels
 
   async def get_question(self, channel_name, precategory=None):
-    api_url = 'https://opentdb.com/api.php?amount=1&type=multiple'
+    api_url = 'https://opentdb.com/api.php?amount=5&type=multiple'
     cat_ids = []
     categories = ''
 
+    # Use pre-determined category if provided
     if precategory != None:
       if precategory.upper() in CATEGORIES:
         categories = precategory.upper()
@@ -327,13 +329,15 @@ class Bot(commands.Bot):
     else:
       categories = get_channel_category(channel_name)
 
+    # If no category is provided, use channel's category list
     for category in CATEGORIES:
       if category in categories:
         cat_ids.append(CATEGORIES[category])
 
+    # Select a random category from channel's categories
     id = random.choice(cat_ids)
     if not 0 in cat_ids:
-      api_url = f"https://opentdb.com/api.php?amount=1&category={id}&type=multiple"
+      api_url = f"https://opentdb.com/api.php?amount=5&category={id}&type=multiple"
 
     ## Genshin Trivia
     if id == 33:
@@ -342,29 +346,79 @@ class Bot(commands.Bot):
       question_data = random.choice(genshin_questions)
       return question_data
 
-    got_question = False
-    max_tries = 0
+    api_successful = False # Set to True if API request is successful
+    new_question_set_needed = True # Set to False if a question set contains a suitable question
+    api_tries = 0
+    question_set_iteration = 0
 
-    while (not got_question) and (max_tries < 4):
+    while (not api_successful) and (api_tries < MAX_API_TRIES) and (new_question_set_needed):
       response = requests.get(api_url)
       if response.status_code == requests.codes.ok:
-        got_question = True
+        api_successful = True # The API retrieved a set of 5 questions
+        question_set_iteration = 0
+        new_question_set_needed = False
+        # Checking for phrases banned in question and answer.
+        
+        # print(response.json()['results']) #DEBUG
+        while (question_set_iteration < 5): # Iterate through the question set
+          
+          question_contains_banned_phrase = False
+          for phrase in BANNED_IN_QUESTIONS:
+            if phrase in response.json()['results'][question_set_iteration]['question'].upper():
+              print(
+                f"[{channel_name}] ({question_set_iteration + 1} of 5) Question contained '{phrase}' | {response.json()['results'][question_set_iteration]['question']}"
+              )
+              question_contains_banned_phrase = True
+              break
+
+          answer_contains_banned_phrase = False
+          for phrase in BANNED_IN_ANSWER:
+            if phrase in response.json()['results'][question_set_iteration]["correct_answer"].upper():
+              print(
+                f"[{channel_name}] ({question_set_iteration + 1} of 5) Answer contained '{phrase}' | {response.json()['results'][question_set_iteration]['correct_answer']}"
+              )
+              answer_contains_banned_phrase = True
+              break
+
+          # Questions containing 'NOT' in all caps are an edge-case, and should not
+          # be compared to the question with .upper()
+          question_contains_NOT = False
+          if "NOT" in response.json()['results'][question_set_iteration]["question"]:
+            print(
+              f"[{channel_name}] ({question_set_iteration + 1} of 5) Question contained 'NOT' | {response.json()['results'][question_set_iteration]['question']}"
+            )
+            question_contains_NOT = True
+
+          if not question_contains_banned_phrase and not answer_contains_banned_phrase and not question_contains_NOT:
+            print(
+              f"[{channel_name}] Found suitable question ({question_set_iteration + 1} of 5) | {response.json()['results'][question_set_iteration]}"
+            )
+            break
+          else:
+            # print(f"[{channel_name}] BANNED PHRASES IN (Q: {response.json()['results'][question_set_iteration]['question']} A: {response.json()['results'][question_set_iteration]['correct_answer']})")
+            question_set_iteration += 1
+            if question_set_iteration >= 5:
+              new_question_set_needed = True
+        
       else:
-        if max_tries < 3:
+        api_successful = False
+        if api_tries < MAX_API_TRIES:
           print(
-            f"[{channel_name}] Error: {response.status_code} | {response.text}"
+            f"[{channel_name}] API Error: {response.status_code} | {response.text}"
           )
-          print(f"[{channel_name}] Retrying... ({max_tries + 1} of 3)")
-          max_tries += 1
-          await asyncio.sleep(max_tries + 2)
+          print(f"[{channel_name}] Retrying... ({api_tries + 1} of {MAX_API_TRIES})")
+          api_tries += 1
+          await asyncio.sleep(3)
 
         else:
           print(f"[{channel_name}] API failure: Question failed.")
           return None
 
     parsed_response = json.loads(response.text)
-    question_data = parsed_response["results"]
-    return question_data[0]
+    # print(parsed_response) #DEBUG
+    question_data = parsed_response["results"][question_set_iteration]
+    # print(question_data) #DEBUG
+    return question_data
 
   def format_question(self, question):
     formatted_question = html.unescape(question['question'])
@@ -373,7 +427,6 @@ class Bot(commands.Bot):
     question['question'] = formatted_question
     question['correct_answer'] = formatted_answer
     question['category'] = formatted_category
-    return question
     return question
 
   def get_channel_state(self, channel_name):
@@ -444,13 +497,13 @@ class Bot(commands.Bot):
       ) if channel_state['current_question'] else None
 
       if (similarity(user_answer, correct_answer) >= ANSWER_CLOSE) and (
-          similarity(user_answer, correct_answer) < ANSWER_CORRECTNESS):
+          similarity(user_answer, correct_answer) < ANSWER_CORRECTNESS): #If user answers CLOSELY
         user = message.author.name
         await message.channel.send(
           f"{user} is close! {round(similarity(user_answer, correct_answer) * 100, 2)}% accurate."
         )
 
-      if similarity(user_answer, correct_answer) >= ANSWER_CORRECTNESS:
+      if similarity(user_answer, correct_answer) >= ANSWER_CORRECTNESS: #If user answers CORRECTLY
         user = message.author.name
         channel = message.channel.name
         add_score(channel, user, CORRECT_ANSWER_VALUE)
@@ -460,7 +513,7 @@ class Bot(commands.Bot):
         await message.channel.send(
           f"{user} answered with {round(similarity(user_answer, correct_answer) * 100, 2)}% accuracy! Their score is now   {get_score(channel, user)}. Answer: {channel_state['current_question']['answer']}"
         )
-      channel_state['current_question'] = None
+        channel_state['current_question'] = None
 
     await self.handle_commands(message)
 
@@ -483,54 +536,16 @@ class Bot(commands.Bot):
 
     channel_state['last_trivia'] = time.time()
 
-    if not channel_state['current_question']:
+    if not channel_state['current_question']: # Checking if the current_question is None (i.e. no question is active)
+      if not cat == None: # If a category is provided
+        question_data = await self.get_question(channel_name, cat)
+      else: # If a cateogry is not provided
+        question_data = await self.get_question(channel_name)
 
-      # Checking for phrases banned in question and answer.
-
-      while True:
-        if not cat == None:
-          question_data = await self.get_question(channel_name, cat)
-        else:
-          question_data = await self.get_question(channel_name)
-
-        if question_data == None:
-          print(f"[{channel_name}] API failure: Question failed.")
-          await ctx.send("Trivia API failed. Try again.")
-          return
-
-        question_contains_phrase = False
-        for phrase in BANNED_IN_QUESTIONS:
-          if phrase in question_data["question"].upper():
-            print(
-              f"[{channel_name}] Question contained '{phrase}'; Generating new question."
-            )
-            question_contains_phrase = True
-            break
-
-        answer_contains_phrase = False
-        for phrase in BANNED_IN_ANSWER:
-          if phrase in question_data["correct_answer"].upper():
-            print(
-              f"[{channel_name}] Answer contained '{phrase}'; Generating new question."
-            )
-            answer_contains_phrase = True
-            break
-
-        # Questions containing 'NOT' in all caps are an edge-case, and should not
-        # be compared to the question with .upper()
-        question_contains_NOT = False
-        if "NOT" in question_data["question"]:
-          print(
-            f"[{channel_name}] Question contained 'NOT'; Generating new question."
-          )
-          question_contains_NOT = True
-
-        if not question_contains_phrase and not answer_contains_phrase and not question_contains_NOT:
-          break
-        else:
-          print(
-            f"[{channel_name}] BANNED PHRASES IN (Q: {question_data['question']} A: {question_data['correct_answer']})"
-          )
+      if question_data == None: # If get_question returns None, API failed.
+        print(f"[{channel_name}] API failure: Question failed.")
+        await ctx.send("Trivia API failed. Try again.")
+        return
 
       question_data = self.format_question(question_data)
 
