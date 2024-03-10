@@ -10,17 +10,17 @@
     "difficulty":"Medium",
     "category":"Genshin"
   },
-  { "question":"How many playable cryo characters are in the game as of 4.3",
+  { "question":"How many playable cryo characters are in the game as of 4.3?",
     "correct_answer":"15",
     "difficulty":"Medium",
     "category":"Genshin"
   },
-  { "question":"What element and weapon combination is missing from the playable characters",
+  { "question":"What element and weapon combination is missing from the playable characters?",
     "correct_answer":"Hydro Claymore",
     "difficulty":"Medium",
     "category":"Genshin"
   },
-  { "question":"Which Element has the least playable chara",
+  { "question":"Which Element has the least playable characters?",
     "correct_answer":"Geo and Dendro",
     "difficulty":"Medium",
     "category":"Genshin"
@@ -66,12 +66,12 @@
     "difficulty":"Medium",
     "category":"Genshin"
   },
-  { "question":"What is Biazhus weapon called?",
+  { "question":"What is Baizhus weapon called?",
     "correct_answer":"Jadefall Splendor",
     "difficulty":"Medium",
     "category":"Genshin"
   },
-  { "question":"True or False: Keqing is an adepti",
+  { "question":"is Keqing an adepti?",
     "correct_answer":"False",
     "difficulty":"Easy",
     "category":"Genshin"
@@ -96,7 +96,7 @@
   "difficulty":"Hard",
   "category":"Genshin"
   }, 
-  { "question":"How Long was Ayakas second banner",
+  { "question":"How Long was Ayakas second banner?",
   "correct_answer":"42 days",
   "difficulty":"Hard",
   "category":"Genshin"
@@ -171,7 +171,7 @@
   "difficulty":"Medium",
   "category":"Genshin"
   }, 
-  { "question":"Who is the first character the traveller sees in their journey excluding Paimon",
+  { "question":"Who is the first character the traveller sees in their journey excluding Paimon?",
   "correct_answer":"Venti",
   "difficulty":"Medium",
   "category":"Genshin"
@@ -181,7 +181,7 @@
   "difficulty":"Medium",
   "category":"Genshin"
   }, 
-  { "question":"What region has the longest archon quest",
+  { "question":"What region has the most chapters in the archon quest?",
   "correct_answer":"Sumeru",
   "difficulty":"Medium",
   "category":"Genshin"
@@ -262,7 +262,7 @@
   "difficulty":"Easy",
   "category":"Genshin"
   },
-  { "question":"Who is known as the Star of Zubayr Theatre",
+  { "question":"Who is known as the Star of Zubayr Theatre?",
   "correct_answer":"Nilou",
   "difficulty":"Medium",
   "category":"Genshin"
@@ -277,7 +277,7 @@
   "difficulty":"Easy",
   "category":"Genshin"
   },
-  { "question":"Which character has the highest base ATK",
+  { "question":"Which character has the highest base ATK?",
   "correct_answer":"Xiao",
   "difficulty":"Hard",
   "category":"Genshin"
@@ -292,17 +292,17 @@
   "difficulty":"Easy",
   "category":"Genshin"
   },
-  { "question":"How much adeptal energy is needed to max out Realm currency acumulation rate",
+  { "question":"How much adeptal energy is needed to max out Realm currency accumulation rate?",
   "correct_answer":"20000",
   "difficulty":"Easy",
   "category":"Genshin"
   },
-  { "question":"How much realm currency can be accululated per hour",
+  { "question":"How much realm currency can be accumulated per hour?",
   "correct_answer":"30",
   "difficulty":"Medium",
   "category":"Genshin"
   },
-  { "question":"Which elite enemy drops Chilled Meat",
+  { "question":"Which elite enemy drops Chilled Meat?",
   "correct_answer":"The Great Snowboar King",
   "difficulty":"Medium",
   "category":"Genshin"
@@ -322,7 +322,7 @@
   "difficulty":"Easy",
   "category":"Genshin"
   },
-  { "question":"How many weapons can be found through exploration alone",
+  { "question":"How many weapons can be found through exploration alone?",
   "correct_answer":"11",
   "difficulty":"Hard",
   "category":"Genshin"
@@ -345,6 +345,156 @@
   { "question":"How many sides does the dice in Genius invokation TCG have?",
   "correct_answer":"8",
   "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which character gains Physical DMG Bonus from ascending?",
+  "correct_answer":"Razor",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Who was the first character to be both a playable character and a boss?",
+  "correct_answer":"Tartaglia",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Sangonomiya Kokomi is the divine priestess of which island?",
+  "correct_answer":"Watatsumi Island",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What do you get from clearing a Domain of Mastery?",
+  "correct_answer":"Character Talent Materials",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"How many Shrines of Depths exist in each region?",
+  "correct_answer":"10",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What achievement do you receive by exhausting the ten minutes given to complete a bounty?",
+  "correct_answer":"Quest failed",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"The creators of Genius Invokation TCG were from where?",
+  "correct_answer":"Sumeru",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What is the currency used in the Genius Invokation TCG Card Shop?",
+  "correct_answer":"Lucky Coins",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which gadget is used to capture animals in order to place them in the Serenitea Pot?",
+  "correct_answer":"Omni-Ubiquity Net",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which character has a passive talent related to obtaining wood?",
+  "correct_answer":"Arataki Itto",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which event-exclusive 5-star characters do not have a story quest?",
+  "correct_answer":"Shenhe & Wanderer",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which character story quests have a name that differs from their character's constellation name?",
+  "correct_answer":"Zhongli & Neuvilette",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What character story quests are prerequisites to progress the main Archon quests?",
+  "correct_answer":"Kamisato Ayaka, Razor & Yoimiya",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"In which character story quests does the character not appear as a trial character?",
+  "correct_answer":"Albedo, Neuvilette & Furina",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Who was the first character to have a hangout and a story quest?",
+  "correct_answer":"Kaeya",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Which non-archon character was the first to get a second story chapter?",
+  "correct_answer":"Yoimiya",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"When was the last 4-star character story quest added?",
+  "correct_answer":"version 1.0",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which weapon's attack scales with the number of Melusines you've helped?",
+  "correct_answer":"\"Ultimate Overlord's Mega Magic Sword\"",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which artifact set has a 2 piece bonus that increases CRIT Rate?",
+  "correct_answer":"Berserker",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which character has the lowest Elemental Skill cooldown?",
+  "correct_answer":"Lisa",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What is the energy cost of the most expensive elemental burst?",
+  "correct_answer":"90",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Where did Egeria die during the cataclysm?",
+  "correct_answer":"Tunigi Hollow",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Which common enemy does not drop anything?",
+  "correct_answer":"Cicins",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What kind of enemies have lower resistance to Physical DMG?",
+  "correct_answer":"Human enemies",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What are the race of plant-like forest spirits in Sumeru called?",
+  "correct_answer":"Aranara",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"How many Visions were seized by the Vision Hunt Decree?",
+  "correct_answer":"99",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"How many enemies can drop Recruit's Insignia?",
+  "correct_answer":"9",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Which weapon material has the most uses?",
+  "correct_answer":"Boreal Wolf",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Which material has the most uses?",
+  "correct_answer":"Slime Condensate",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"How many things, excluding cooking, can Slime Condensate be used for?",
+  "correct_answer":"34",
+  "difficulty":"Hard",
   "category":"Genshin"
   }
 ]
