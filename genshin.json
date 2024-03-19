@@ -761,5 +761,10 @@
   "correct_answer":"The Tsaritsa",
   "difficulty":"Hard",
   "category":"Genshin"
+  },
+  { "question":"Which character(s) have no Invincibility Frames on their burst",
+  "correct_answer":"Fischl",
+  "difficulty":"Medium",
+  "category":"Genshin"
   }
 ]
