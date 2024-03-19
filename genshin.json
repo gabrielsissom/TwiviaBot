@@ -21,7 +21,7 @@
     "category":"Genshin"
   },
   { "question":"Which Element has the least playable characters?",
-    "correct_answer":"Geo and Dendro",
+    "correct_answer":"Dendro",
     "difficulty":"Medium",
     "category":"Genshin"
   },
@@ -211,8 +211,8 @@
   "difficulty":"Medium",
   "category":"Genshin"
   },
-  { "question":"Who is the only character in the game that uses dendrobiums for ascension?",
-  "correct_answer":"Kujou Sara",
+  { "question":"Who are the characters that uses dendrobiums for ascension?",
+  "correct_answer":"Kujou Sara & Chiori",
   "difficulty":"Medium",
   "category":"Genshin"
   },
@@ -238,7 +238,7 @@
   "category":"Genshin"
   },
   { "question":"What is the highest crit rate % an artifact can have as a substat?",
-  "correct_answer":"23.4",
+  "correct_answer":"23.3",
   "difficulty":"Medium",
   "category":"Genshin"
   },
@@ -322,7 +322,7 @@
   "difficulty":"Easy",
   "category":"Genshin"
   },
-  { "question":"How many weapons can be found through exploration alone?",
+  { "question":"How many weapons can exclusively be found through exploration alone?",
   "correct_answer":"11",
   "difficulty":"Hard",
   "category":"Genshin"
