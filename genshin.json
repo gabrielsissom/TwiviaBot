@@ -21,7 +21,7 @@
     "category":"Genshin"
   },
   { "question":"Which Element has the least playable characters?",
-    "correct_answer":"Geo and Dendro",
+    "correct_answer":"Dendro",
     "difficulty":"Medium",
     "category":"Genshin"
   },
@@ -71,7 +71,7 @@
     "difficulty":"Medium",
     "category":"Genshin"
   },
-  { "question":"is Keqing an adepti?",
+  { "question":"is Keqing an adeptus?",
     "correct_answer":"False",
     "difficulty":"Easy",
     "category":"Genshin"
@@ -161,12 +161,12 @@
   "difficulty":"Hard",
   "category":"Genshin"
   }, 
-  { "question":"Who is the 3rd free character you recieve going through the story?",
+  { "question":"Who is the 3rd free character you receive going through the story?",
   "correct_answer":"Lisa",
   "difficulty":"Medium",
   "category":"Genshin"
   }, 
-  { "question":"Who is the 2nd free character you recieve going through the story?",
+  { "question":"Who is the 2nd free character you receive going through the story?",
   "correct_answer":"kaeya",
   "difficulty":"Medium",
   "category":"Genshin"
@@ -211,8 +211,8 @@
   "difficulty":"Medium",
   "category":"Genshin"
   },
-  { "question":"Who is the only character in the game that uses dendrobiums for ascension?",
-  "correct_answer":"Kujou Sara",
+  { "question":"Who are the characters that uses dendrobiums for ascension?",
+  "correct_answer":"Kujou Sara & Chiori",
   "difficulty":"Medium",
   "category":"Genshin"
   },
@@ -238,7 +238,7 @@
   "category":"Genshin"
   },
   { "question":"What is the highest crit rate % an artifact can have as a substat?",
-  "correct_answer":"23.4",
+  "correct_answer":"23.3",
   "difficulty":"Medium",
   "category":"Genshin"
   },
@@ -278,7 +278,7 @@
   "category":"Genshin"
   },
   { "question":"Which character has the highest base ATK?",
-  "correct_answer":"Xiao",
+  "correct_answer":"Navia",
   "difficulty":"Hard",
   "category":"Genshin"
   },
@@ -322,7 +322,7 @@
   "difficulty":"Easy",
   "category":"Genshin"
   },
-  { "question":"How many weapons can be found through exploration alone?",
+  { "question":"How many weapons can exclusively be found through exploration alone?",
   "correct_answer":"11",
   "difficulty":"Hard",
   "category":"Genshin"
@@ -493,8 +493,278 @@
   "category":"Genshin"
   },
   { "question":"How many things, excluding cooking, can Slime Condensate be used for?",
-  "correct_answer":"34",
+  "correct_answer":"30",
   "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Which playable character apart from the Traveler does not have a signature dish?",
+  "correct_answer":"Raiden Shogun",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which Forging Material can be mined only in Dragonspine?",
+  "correct_answer":"Starsilver",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which Forging Material is found exclusively in Inazuma?",
+  "correct_answer":"Amethyst Lumps",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Hu Tao is the 77th Director of _____",
+  "correct_answer":"The Wangsheng Funeral Parlor",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What was the name of the contraption that delivered judgement in Fontaine's Opera Epiclese for 500 years?",
+  "correct_answer":"The Oratrice Mecanique d'Analyse Cardinale",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Which characters do not showcase visible breath when exposed to Sheer Cold in Dragonspine?",
+  "correct_answer":"Raiden Shogun and The Wanderer",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Neuvillette and Apep fall under which faction of beings?",
+  "correct_answer":"Sovereigns",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What item is required to activate characters' constellations? (except traveler)",
+  "correct_answer":"Stella Fortuna",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which character's passive talent reduces their CRIT Rate to a negative value?",
+  "correct_answer":"Sangonomiya Kokomi",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which Normal Boss drops the item \"Dew of Repudiation?\"",
+  "correct_answer":"Hydro Hypostasis",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What Weekly Boss do you have to defeat to max Aloy's talents?",
+  "correct_answer":"La Signora",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which characters wear a fake Vision?",
+  "correct_answer":"Venti and Zhongli",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"How many artifact sets have a 2-piece effect of +18% ATK?",
+  "correct_answer":"7",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Who's signature dish is \"Dizziness-Be-Gone no Jutsu Version 2.0?\"",
+  "correct_answer":"Sayu",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"How many character cards can you have in a Genius Invokation TCG deck?",
+  "correct_answer":"3",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which playable character has an aquabus line named after them?",
+  "correct_answer":"Navia",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which character's Elemental Burst has the longest cooldown?",
+  "correct_answer":"Yae Miko",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which playable Archon has the cheapest Elemental Burst?",
+  "correct_answer":"Zhongli",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Who is the only 5-star character to have two distinct versions of an Elemental Burst?",
+  "correct_answer":"Tartaglia",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Who got a vision first between lyney and lynette?",
+  "correct_answer":"Lynette",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Which living being used to have homes in the dark sea?",
+  "correct_answer":"Seelies",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What place is known as the Sea of Ashes?",
+  "correct_answer":"Mare Jivari",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Is Lisa part of the Hexenzirkel?",
+  "correct_answer":"False",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What is Raiden Ei's demon name?",
+  "correct_answer":"Beelzebul",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What is the name of the Darshan with the largest number of researchers?",
+  "correct_answer":"Amurta",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"How did Kaveh's father die?",
+  "correct_answer":"Quicksand in the desert",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Who is the God of Salt",
+  "correct_answer":"Havria",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Who was the White Knight in Mondstadt history?",
+  "correct_answer":"The Bloodstained Knight",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What is another name for vision wielders?",
+  "correct_answer":"Allogenes",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Who is Vedrfolnir?",
+  "correct_answer":"A visionary",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Who said these words to the Traveler: The world you once knew is but dust, and the wonders you knew but rubble. Though you should have your own world, and your own people — lamenting what is already lost...?",
+  "correct_answer":"K.K.",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What is the Kätzlein bloodline known for apart from their feline features?",
+  "correct_answer":"Their hunting prowess",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which character once tried to weigh a vision?",
+  "correct_answer":"Yanfei",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which artifact set has lore about Tsurumi Island?",
+  "correct_answer":"Thundering fury",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Which playable character suffers from pumpkin phobia (fear of pumpkins)?",
+  "correct_answer":"Lisa",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Who tricked the Locals into Unsealing Tartarigami on Yashiori island?",
+  "correct_answer":"Nathan",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What is the element of Bosacius, Indarius, Bonanus and Menogias respectively?",
+  "correct_answer":"Electro, Pyro, Hydro, Geo",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Who taught Aberaku about the Dainichi Mikoshi?",
+  "correct_answer":"Kairos",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"The Viridescent Arrow Feather is of which bird?",
+  "correct_answer":"Falcon",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Is it true that Amenoma, Isshin, Futsu, Hyakume, and Senju were all once part of the prestigious Raiden Gokaden school of swordsmithing?",
+  "correct_answer":"True",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What is another name for the Abyss?",
+  "correct_answer":"The void realm",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What are the Aquabus lines, Clementine and Callas named after?",
+  "correct_answer":"Navia's family",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Where did Remus first appear?",
+  "correct_answer":"The primordial sea",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What is the adeptus name of Ping?",
+  "correct_answer":"Streetward Rambler",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"How long was Tartaglia trapped in the Abyss when he first fell in?",
+  "correct_answer":"3 months abyss time, 3 days teyvat time",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Did hilichurls exist before the Khaenri'ahn cataclysm?",
+  "correct_answer":"True",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What can be seen in visions and by the people who ascended to celestia?",
+  "correct_answer":"A helix-shaped ladder",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What in Genshin Impact is also known as \"God's eye\"?",
+  "correct_answer":"A Vision",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What was the title of Frederica in the knights of Favonius?",
+  "correct_answer":"Alder knight",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What is another name for Khaenri'ah?",
+  "correct_answer":"Dahri",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What is the correct order of Samsara cycles according to the Narzissenkreuz ordo?",
+  "correct_answer":"Hyperborea, Natlantean, Remuria, Khraun-Arya",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Which elemental ascension stone differs from the rest thematically?",
+  "correct_answer":"Cryo gem stone",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"From who did Yelan intercept a delivery from to make her coat",
+  "correct_answer":"The Tsaritsa",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Which character(s) have no Invincibility Frames on their burst",
+  "correct_answer":"Fischl",
+  "difficulty":"Medium",
   "category":"Genshin"
   }
 ]
