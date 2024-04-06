@@ -71,11 +71,6 @@
     "difficulty":"Medium",
     "category":"Genshin"
   },
-  { "question":"is Keqing an adeptus?",
-    "correct_answer":"False",
-    "difficulty":"Easy",
-    "category":"Genshin"
-  },
   { "question":"What is Beidous crew called?",
   "correct_answer":"The Crux",
   "difficulty":"Easy",
@@ -607,11 +602,6 @@
   "difficulty":"Hard",
   "category":"Genshin"
   },
-  { "question":"Is Lisa part of the Hexenzirkel?",
-  "correct_answer":"False",
-  "difficulty":"Hard",
-  "category":"Genshin"
-  },
   { "question":"What is Raiden Ei's demon name?",
   "correct_answer":"Beelzebul",
   "difficulty":"Hard",
@@ -692,11 +682,6 @@
   "difficulty":"Hard",
   "category":"Genshin"
   },
-  { "question":"Is it true that Amenoma, Isshin, Futsu, Hyakume, and Senju were all once part of the prestigious Raiden Gokaden school of swordsmithing?",
-  "correct_answer":"True",
-  "difficulty":"Hard",
-  "category":"Genshin"
-  },
   { "question":"What is another name for the Abyss?",
   "correct_answer":"The void realm",
   "difficulty":"Hard",
@@ -720,11 +705,6 @@
   { "question":"How long was Tartaglia trapped in the Abyss when he first fell in?",
   "correct_answer":"3 months abyss time, 3 days teyvat time",
   "difficulty":"Medium",
-  "category":"Genshin"
-  },
-  { "question":"Did hilichurls exist before the Khaenri'ahn cataclysm?",
-  "correct_answer":"True",
-  "difficulty":"Hard",
   "category":"Genshin"
   },
   { "question":"What can be seen in visions and by the people who ascended to celestia?",
@@ -764,6 +744,156 @@
   },
   { "question":"Which character(s) have no Invincibility Frames on their burst",
   "correct_answer":"Fischl",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"How many hours does it take for a local specialty to spawn again?",
+  "correct_answer":"48",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What God was responsible for creating Watatsumi Island?",
+  "correct_answer":"Orobashi",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What happened to King Deshret's body after his demise?",
+  "correct_answer":"Consumed by Apep",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"The three God-Kings of Sumeru included Greater Lord Rukkhadevata, King Deshret and ...?",
+  "correct_answer":"Nabu Malikata",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What was the name of the creature that attacked Diluc and his father, and was later killed by Il Dottore?",
+  "correct_answer":"Ursa the Drake",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What is the ideal associated with Barbatos and Mondstadt?",
+  "correct_answer":"Freedom",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What is the ideal associated with Rex Lapis and Liyue?",
+  "correct_answer":"Contracts",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What is the ideal associated with Raiden Shogun and Inazuma?",
+  "correct_answer":"Eternity",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What is the ideal associated with Kusanali and Sumeru?",
+  "correct_answer":"Wisdom",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What was the ideal associated with Focalors and Fontaine?",
+  "correct_answer":"Justice",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"The Amrita was made from the remains of which deity?",
+  "correct_answer":"Egeria",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Who is the Crimson Witch of Flames mentioned in the artifact set of the same name?",
+  "correct_answer":"La Signora",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"The ancient kingdom of Sal Vindagynr was situated in which region of the game?",
+  "correct_answer":"Dragonspine",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Rene's \"world-formula\" failed to take which factor into account while calculating doomsday?",
+  "correct_answer":"The Traveler",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"The Melusines and Breacher Primuses were created from whose remains?",
+  "correct_answer":"Elynas",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Wildlife that have mutated as a result of eating greater lifeforms such as Gods, are known as ...?",
+  "correct_answer":"Consecrated Beasts",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Who is the practitioner of Khemia responsible for creating Riftwolves, the shadow dragon Durin and Albedo?",
+  "correct_answer":"Rhinedottir",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Who was the first playable character with an idle animation that causes an Element to be applied to themselves?",
+  "correct_answer":"Neuvilette",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"The All-Devouring Narwhal is whose pet?",
+  "correct_answer":"Surtalogi",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What was the name of the radical organisation that attempted to use the power of the Abyss to save Fontaine?",
+  "correct_answer":"The Narzissenkreuz Ordo",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Who established the Fontaine Research Institute of Kinetic Energy Engineering?",
+  "correct_answer":"Alain Guillotin",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What entity does Lesser Lord Kusanali presume to be the First Descender?",
+  "correct_answer":"The Heavenly Principles",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Who takes offense great offense to being called a witch, despite having it in their title?",
+  "correct_answer":"La Signora",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"How many different hillichurl enemies are there?",
+  "correct_answer":"30",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Where is the enemy 'Black Serpent Knight: Rockbreaker Ax' exclusively found",
+  "correct_answer":"The spiral abyss",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Who were cursed by immortality for 'sinning'?",
+  "correct_answer":"The people of Khaenri'ah",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which character is a master of the ancient martial art school, serving as a predecessor to Keqing's fighting style known as Yunlai Swordsmanship?",
+  "correct_answer":"Qiqi",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Who is the deity that created the world of Teyvat?",
+  "correct_answer":"The primordial one",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What is the name of the region where the Liyue Harbor is located?",
+  "correct_answer":"Sea of clouds",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which character is known as the 'Eclipsing Star' and is a skilled martial artist proficient in Geo abilities?",
+  "correct_answer":"Ningguang",
   "difficulty":"Medium",
   "category":"Genshin"
   }
