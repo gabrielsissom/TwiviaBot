@@ -703,7 +703,7 @@ class Bot(commands.Bot):
 
   @commands.command()
   async def newgame(self, ctx: commands.Context):
-    if ctx.author.is_mod or ctx.author.name == 'itssport':
+    if (ctx.author.name == ctx.channel.name) or (ctx.author.name == 'itssport'):
       await self.skip(ctx) # skip current question if exists
       await self.leaderboard(ctx)
       reset_user_scores(ctx.channel.name)

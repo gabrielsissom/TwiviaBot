@@ -27,7 +27,7 @@ A trivia game bot for your Twitch chat. To get started, visit [TwiviaBot's chann
 - Points are tracked separeately in different Twitch channels, so leaderboards will also be independent.
 
 ### %newgame - Starts a new game in the current channel.
-- Only the **channel owner** or a **moderator** of the channel may start a new game.
+- Only the **channel owner** may start a new game.
 - Points are reset to 0 for all users in current channel only.
 
 ### %skip - Skips the current trivia game question.
