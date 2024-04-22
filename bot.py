@@ -151,12 +151,23 @@ def get_top_users(channel_name, limit=5):
   conn = get_db_connection()
   c = conn.cursor()
   c.execute(
-    'SELECT username, score FROM users WHERE channel = %s ORDER BY score DESC LIMIT %s',
+    'SELECT username, score FROM users WHERE channel = %s AND score > 0 ORDER BY score DESC LIMIT %s',
     (channel_name, limit))
   result = c.fetchall()
   c.close()
   conn.close()
   return result
+
+def reset_user_scores(channel_name):
+  conn = get_db_connection()
+  c = conn.cursor()
+  c.execute(
+    'UPDATE users SET score = 0 WHERE channel = %s', 
+    (channel_name,))
+  conn.commit()
+  c.close()
+  conn.close()
+  return
 
 
 def get_channel_cooldown(channel_name):
@@ -312,7 +323,7 @@ class Bot(commands.Bot):
                      initial_channels=channels)
 
     self.channel_states = {}  # key: channel_name, value: channel state
-    self.current_question = None
+    # self.current_question = None  # deprecated use channel_states
     self.channels = channels
 
   async def get_question(self, channel_name, precategory=None):
@@ -689,6 +700,14 @@ class Bot(commands.Bot):
     for idx, user in enumerate(top_users, start=1):
       leaderboard_message += f"{idx}. {user[0]} - {user[1]} points | \n"
     await ctx.send(leaderboard_message)
+
+  @commands.command()
+  async def newgame(self, ctx: commands.Context):
+    if ctx.author.is_mod or ctx.author.name == 'itssport':
+      await self.skip(ctx) # skip current question if exists
+      await self.leaderboard(ctx)
+      reset_user_scores(ctx.channel.name)
+      await ctx.send(f"New Game started in {ctx.channel.name}'s channel!")
 
   @commands.command()
   async def skip(self, ctx: commands.Context):
