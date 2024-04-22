@@ -24,7 +24,11 @@ A trivia game bot for your Twitch chat. To get started, visit [TwiviaBot's chann
 - Points are tracked separately in different Twitch channels.
 
 ### %leaderboard - Displays the top 5 users with the most points in the current channel.
-- Points are tracked separeately in different Twitch channels, so leaderboards will also be independent. 
+- Points are tracked separeately in different Twitch channels, so leaderboards will also be independent.
+
+### %newgame - Starts a new game in the current channel.
+- Only the **channel owner** or a **moderator** of the channel may start a new game.
+- Points are reset to 0 for all users in current channel only.
 
 ### %skip - Skips the current trivia game question.
 - Only the **channel owner** or a **moderator** of the channel may skip a question.
