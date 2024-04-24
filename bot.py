@@ -95,6 +95,10 @@ def setup_db():
     '''ALTER TABLE channels ADD COLUMN IF NOT EXISTS is_premium BOOLEAN NOT NULL DEFAULT FALSE'''
   )
 
+  c.execute(
+    '''ALTER TABLE channels ADD COLUMN IF NOT EXISTS is_paused BOOLEAN NOT NULL DEFAULT FALSE'''
+  )
+
   conn.commit()
   conn.close()
 
@@ -275,6 +279,29 @@ def remove_premium(channel_name):
   conn.close()
 
 
+def set_is_paused(channel_name, is_paused: bool):
+  conn = get_db_connection()
+  c = conn.cursor()
+  c.execute(
+    'UPDATE channels SET is_paused = %s WHERE name = %s', 
+    (is_paused, channel_name,))
+  conn.commit()
+  c.close()
+  conn.close()
+
+
+def get_is_paused(channel_name):
+  conn = get_db_connection()
+  c = conn.cursor()
+  c.execute(
+    'SELECT is_paused FROM channels WHERE name = %s', 
+    (channel_name,))
+  result = c.fetchone()
+  c.close()
+  conn.close()
+  return result[0]
+
+
 def reset_scores(channel_name):
   conn = get_db_connection()
   c = conn.cursor()
@@ -442,10 +469,17 @@ class Bot(commands.Bot):
 
   def get_channel_state(self, channel_name):
     if channel_name not in self.channel_states:
+      is_paused = get_is_paused(channel_name)
       self.channel_states[channel_name] = {
         'current_question': None,
+        'is_paused': is_paused,
       }
     return self.channel_states[channel_name]
+
+  def update_game_state(self, channel_name, *, is_paused: bool):
+    channel_state = self.get_channel_state(channel_name)
+    set_is_paused(channel_name, is_paused)
+    channel_state['is_paused'] = is_paused
 
   def clean_up_channel_state(self, channel_name):
     if channel_name in self.channel_states:
@@ -532,6 +566,11 @@ class Bot(commands.Bot):
   async def trivia(self, ctx: commands.Context, cat: str = None):
     channel_name = ctx.channel.name
     channel_state = self.get_channel_state(channel_name)
+
+    if channel_state.get('is_paused'):
+      await ctx.send(f"{ctx.channel.name}'s game is paused. '%game resume' to keep playing!")
+      return
+
     if 'last_trivia' not in channel_state:
       channel_state['last_trivia'] = 0
 
@@ -702,11 +741,26 @@ class Bot(commands.Bot):
     await ctx.send(leaderboard_message)
 
   @commands.command()
+  async def game(self, ctx: commands.Context, arg: str = None):
+    if (ctx.author.name == ctx.channel.name) or (ctx.author.name == 'itssport'):
+        if (arg == 'pause'):
+          await self.skip(ctx) # skip current question if exists
+          self.update_game_state(ctx.channel.name, is_paused=True)
+          await ctx.send(f"{ctx.channel.name}'s game paused.")
+        elif (arg == 'resume'):
+            self.update_game_state(ctx.channel.name, is_paused=False)
+            await ctx.send(f"{ctx.channel.name}'s game resumed.")
+        else:
+            await ctx.send("unrecongnized command argument; try '%game pause' or '%game resume'")
+
+
+  @commands.command()
   async def newgame(self, ctx: commands.Context):
     if (ctx.author.name == ctx.channel.name) or (ctx.author.name == 'itssport'):
       await self.skip(ctx) # skip current question if exists
       await self.leaderboard(ctx)
       reset_user_scores(ctx.channel.name)
+      self.update_game_state(ctx.channel.name, is_paused=False)
       await ctx.send(f"New Game started in {ctx.channel.name}'s channel!")
 
   @commands.command()
