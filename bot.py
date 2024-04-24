@@ -162,12 +162,11 @@ def get_top_users(channel_name, limit=5):
   conn.close()
   return result
 
+
 def reset_user_scores(channel_name):
   conn = get_db_connection()
   c = conn.cursor()
-  c.execute(
-    'UPDATE users SET score = 0 WHERE channel = %s', 
-    (channel_name,))
+  c.execute('UPDATE users SET score = 0 WHERE channel = %s', (channel_name, ))
   conn.commit()
   c.close()
   conn.close()
@@ -282,9 +281,10 @@ def remove_premium(channel_name):
 def set_is_paused(channel_name, is_paused: bool):
   conn = get_db_connection()
   c = conn.cursor()
-  c.execute(
-    'UPDATE channels SET is_paused = %s WHERE name = %s', 
-    (is_paused, channel_name,))
+  c.execute('UPDATE channels SET is_paused = %s WHERE name = %s', (
+    is_paused,
+    channel_name,
+  ))
   conn.commit()
   c.close()
   conn.close()
@@ -293,9 +293,7 @@ def set_is_paused(channel_name, is_paused: bool):
 def get_is_paused(channel_name):
   conn = get_db_connection()
   c = conn.cursor()
-  c.execute(
-    'SELECT is_paused FROM channels WHERE name = %s', 
-    (channel_name,))
+  c.execute('SELECT is_paused FROM channels WHERE name = %s', (channel_name, ))
   result = c.fetchone()
   c.close()
   conn.close()
@@ -384,25 +382,27 @@ class Bot(commands.Bot):
       question_data = random.choice(genshin_questions)
       return question_data
 
-    api_successful = False # Set to True if API request is successful
-    new_question_set_needed = True # Set to False if a question set contains a suitable question
+    api_successful = False  # Set to True if API request is successful
+    new_question_set_needed = True  # Set to False if a question set contains a suitable question
     api_tries = 0
     question_set_iteration = 0
 
-    while (not api_successful) and (api_tries < MAX_API_TRIES) and (new_question_set_needed):
+    while (not api_successful) and (api_tries < MAX_API_TRIES) and (
+        new_question_set_needed):
       response = requests.get(api_url)
       if response.status_code == requests.codes.ok:
-        api_successful = True # The API retrieved a set of 5 questions
+        api_successful = True  # The API retrieved a set of 5 questions
         question_set_iteration = 0
         new_question_set_needed = False
         # Checking for phrases banned in question and answer.
-        
+
         # print(response.json()['results']) #DEBUG
-        while (question_set_iteration < 5): # Iterate through the question set
-          
+        while (question_set_iteration < 5):  # Iterate through the question set
+
           question_contains_banned_phrase = False
           for phrase in BANNED_IN_QUESTIONS:
-            if phrase in response.json()['results'][question_set_iteration]['question'].upper():
+            if phrase in response.json(
+            )['results'][question_set_iteration]['question'].upper():
               print(
                 f"[{channel_name}] ({question_set_iteration + 1} of 5) Question contained '{phrase}' | {response.json()['results'][question_set_iteration]['question']}"
               )
@@ -411,7 +411,8 @@ class Bot(commands.Bot):
 
           answer_contains_banned_phrase = False
           for phrase in BANNED_IN_ANSWER:
-            if phrase in response.json()['results'][question_set_iteration]["correct_answer"].upper():
+            if phrase in response.json(
+            )['results'][question_set_iteration]["correct_answer"].upper():
               print(
                 f"[{channel_name}] ({question_set_iteration + 1} of 5) Answer contained '{phrase}' | {response.json()['results'][question_set_iteration]['correct_answer']}"
               )
@@ -421,7 +422,8 @@ class Bot(commands.Bot):
           # Questions containing 'NOT' in all caps are an edge-case, and should not
           # be compared to the question with .upper()
           question_contains_NOT = False
-          if "NOT" in response.json()['results'][question_set_iteration]["question"]:
+          if "NOT" in response.json(
+          )['results'][question_set_iteration]["question"]:
             print(
               f"[{channel_name}] ({question_set_iteration + 1} of 5) Question contained 'NOT' | {response.json()['results'][question_set_iteration]['question']}"
             )
@@ -437,14 +439,16 @@ class Bot(commands.Bot):
             question_set_iteration += 1
             if question_set_iteration >= 5:
               new_question_set_needed = True
-        
+
       else:
         api_successful = False
         if api_tries < MAX_API_TRIES:
           print(
             f"[{channel_name}] API Error: {response.status_code} | {response.text}"
           )
-          print(f"[{channel_name}] Retrying... ({api_tries + 1} of {MAX_API_TRIES})")
+          print(
+            f"[{channel_name}] Retrying... ({api_tries + 1} of {MAX_API_TRIES})"
+          )
           api_tries += 1
           await asyncio.sleep(3)
 
@@ -541,14 +545,17 @@ class Bot(commands.Bot):
       correct_answer = channel_state['current_question']['answer'].lower(
       ) if channel_state['current_question'] else None
 
-      if (similarity(user_answer, correct_answer) >= ANSWER_CLOSE) and (
-          similarity(user_answer, correct_answer) < ANSWER_CORRECTNESS): #If user answers CLOSELY
+      if (similarity(user_answer, correct_answer) >=
+          ANSWER_CLOSE) and (similarity(user_answer, correct_answer) <
+                             ANSWER_CORRECTNESS):  #If user answers CLOSELY
         user = message.author.name
         await message.channel.send(
           f"{user} is close! {round(similarity(user_answer, correct_answer) * 100, 2)}% accurate."
         )
 
-      if similarity(user_answer, correct_answer) >= ANSWER_CORRECTNESS: #If user answers CORRECTLY
+      if similarity(
+          user_answer,
+          correct_answer) >= ANSWER_CORRECTNESS:  #If user answers CORRECTLY
         user = message.author.name
         channel = message.channel.name
         add_score(channel, user, CORRECT_ANSWER_VALUE)
@@ -568,7 +575,9 @@ class Bot(commands.Bot):
     channel_state = self.get_channel_state(channel_name)
 
     if channel_state.get('is_paused'):
-      await ctx.send(f"{ctx.channel.name}'s game is paused. '%game resume' to keep playing!")
+      await ctx.send(
+        f"{ctx.channel.name}'s game is paused. '%game resume' to keep playing!"
+      )
       return
 
     if 'last_trivia' not in channel_state:
@@ -586,13 +595,14 @@ class Bot(commands.Bot):
 
     channel_state['last_trivia'] = time.time()
 
-    if not channel_state['current_question']: # Checking if the current_question is None (i.e. no question is active)
-      if not cat == None: # If a category is provided
+    if not channel_state[
+        'current_question']:  # Checking if the current_question is None (i.e. no question is active)
+      if not cat == None:  # If a category is provided
         question_data = await self.get_question(channel_name, cat)
-      else: # If a cateogry is not provided
+      else:  # If a cateogry is not provided
         question_data = await self.get_question(channel_name)
 
-      if question_data == None: # If get_question returns None, API failed.
+      if question_data == None:  # If get_question returns None, API failed.
         print(f"[{channel_name}] API failure: Question failed.")
         await ctx.send("Trivia API failed. Try again.")
         return
@@ -742,26 +752,28 @@ class Bot(commands.Bot):
 
   @commands.command()
   async def game(self, ctx: commands.Context, arg: str = None):
-    if (ctx.author.name == ctx.channel.name) or (ctx.author.name == 'itssport'):
-        if (arg == 'pause'):
-          await self.skip(ctx) # skip current question if exists
-          self.update_game_state(ctx.channel.name, is_paused=True)
-          await ctx.send(f"{ctx.channel.name}'s game paused.")
-        elif (arg == 'resume'):
-            self.update_game_state(ctx.channel.name, is_paused=False)
-            await ctx.send(f"{ctx.channel.name}'s game resumed.")
-        else:
-            await ctx.send("unrecongnized command argument; try '%game pause' or '%game resume'")
-
-
-  @commands.command()
-  async def newgame(self, ctx: commands.Context):
-    if (ctx.author.name == ctx.channel.name) or (ctx.author.name == 'itssport'):
-      await self.skip(ctx) # skip current question if exists
-      await self.leaderboard(ctx)
-      reset_user_scores(ctx.channel.name)
-      self.update_game_state(ctx.channel.name, is_paused=False)
-      await ctx.send(f"New Game started in {ctx.channel.name}'s channel!")
+    if (ctx.author.name == ctx.channel.name) or (ctx.author.name
+                                                 == 'itssport'):
+      if (arg == 'pause'):
+        await self.skip(ctx)  # skip current question if exists
+        self.update_game_state(ctx.channel.name, is_paused=True)
+        await ctx.send(f"{ctx.channel.name}'s game paused.")
+      elif (arg == 'resume'):
+        self.update_game_state(ctx.channel.name, is_paused=False)
+        await ctx.send(f"{ctx.channel.name}'s game resumed.")
+      elif (arg == 'new'):
+        await self.skip(ctx)  # skip current question if exists
+        await self.leaderboard(ctx)
+        reset_user_scores(ctx.channel.name)
+        self.update_game_state(ctx.channel.name, is_paused=False)
+        await ctx.send(
+          f"A new game has started in {ctx.channel.name}'s channel!")
+      else:
+        await ctx.send(
+          "unrecongnized command argument; try '%game pause', '%game resume', or '%game new'"
+        )
+    else:
+      await ctx.send("This command may only be used by the channel owner.")
 
   @commands.command()
   async def skip(self, ctx: commands.Context):
@@ -770,8 +782,7 @@ class Bot(commands.Bot):
       if not channel_state['current_question'] == None:
         await ctx.send('Question skipped. A: ' +
                        channel_state['current_question']["answer"])
-        print(
-          f"[{ctx.channel.name}] Question skipped by {ctx.author.name}")
+        print(f"[{ctx.channel.name}] Question skipped by {ctx.author.name}")
         channel_state['current_question'] = None
     else:
       await ctx.send("You must be a moderator to use this command.")
