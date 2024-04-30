@@ -392,29 +392,30 @@ class Bot(commands.Bot):
       response = requests.get(api_url)
       if response.status_code == requests.codes.ok:
         api_successful = True  # The API retrieved a set of 5 questions
+        results = response.json()['results']  # parse json once
         question_set_iteration = 0
         new_question_set_needed = False
         # Checking for phrases banned in question and answer.
 
-        # print(response.json()['results']) #DEBUG
+        # print(results) #DEBUG
         while (question_set_iteration < 5):  # Iterate through the question set
 
           question_contains_banned_phrase = False
+          question_upper = results[question_set_iteration]['question'].upper()
           for phrase in BANNED_IN_QUESTIONS:
-            if phrase in response.json(
-            )['results'][question_set_iteration]['question'].upper():
+            if phrase in question_upper:
               print(
-                f"[{channel_name}] ({question_set_iteration + 1} of 5) Question contained '{phrase}' | {response.json()['results'][question_set_iteration]['question']}"
+                f"[{channel_name}] ({question_set_iteration + 1} of 5) Question contained '{phrase}' | {results[question_set_iteration]['question']}"
               )
               question_contains_banned_phrase = True
               break
 
           answer_contains_banned_phrase = False
+          answer_upper = results[question_set_iteration]["correct_answer"].upper()
           for phrase in BANNED_IN_ANSWER:
-            if phrase in response.json(
-            )['results'][question_set_iteration]["correct_answer"].upper():
+            if phrase in answer_upper:
               print(
-                f"[{channel_name}] ({question_set_iteration + 1} of 5) Answer contained '{phrase}' | {response.json()['results'][question_set_iteration]['correct_answer']}"
+                f"[{channel_name}] ({question_set_iteration + 1} of 5) Answer contained '{phrase}' | {results[question_set_iteration]['correct_answer']}"
               )
               answer_contains_banned_phrase = True
               break
@@ -422,20 +423,19 @@ class Bot(commands.Bot):
           # Questions containing 'NOT' in all caps are an edge-case, and should not
           # be compared to the question with .upper()
           question_contains_NOT = False
-          if "NOT" in response.json(
-          )['results'][question_set_iteration]["question"]:
+          if "NOT" in results[question_set_iteration]["question"]:
             print(
-              f"[{channel_name}] ({question_set_iteration + 1} of 5) Question contained 'NOT' | {response.json()['results'][question_set_iteration]['question']}"
+              f"[{channel_name}] ({question_set_iteration + 1} of 5) Question contained 'NOT' | {results[question_set_iteration]['question']}"
             )
             question_contains_NOT = True
 
           if not question_contains_banned_phrase and not answer_contains_banned_phrase and not question_contains_NOT:
             print(
-              f"[{channel_name}] Found suitable question ({question_set_iteration + 1} of 5) | {response.json()['results'][question_set_iteration]}"
+              f"[{channel_name}] Found suitable question ({question_set_iteration + 1} of 5) | {results[question_set_iteration]}"
             )
             break
           else:
-            # print(f"[{channel_name}] BANNED PHRASES IN (Q: {response.json()['results'][question_set_iteration]['question']} A: {response.json()['results'][question_set_iteration]['correct_answer']})")
+            # print(f"[{channel_name}] BANNED PHRASES IN (Q: {results[question_set_iteration]['question']} A: {results[question_set_iteration]['correct_answer']})")
             question_set_iteration += 1
             if question_set_iteration >= 5:
               new_question_set_needed = True
@@ -456,9 +456,9 @@ class Bot(commands.Bot):
           print(f"[{channel_name}] API failure: Question failed.")
           return None
 
-    parsed_response = json.loads(response.text)
+    # parsed_response = json.loads(response.text) #DEBUG
     # print(parsed_response) #DEBUG
-    question_data = parsed_response["results"][question_set_iteration]
+    question_data = results[question_set_iteration]
     # print(question_data) #DEBUG
     return question_data
 
