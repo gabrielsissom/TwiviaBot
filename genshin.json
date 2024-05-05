@@ -999,5 +999,60 @@
   "correct_answer":"The Traveler",
   "difficulty":"Easy",
   "category":"Genshin"
+  },
+  { "question":"The Electro Gnosis was entrusted by Raiden Ei to whom?",
+  "correct_answer":"Yae Miko",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"The Gnoses were created from whose remains?",
+  "correct_answer":"The Third Descender",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What caused the desertification of Sumeru's desert?",
+  "correct_answer":"A Divine Nail",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which weapon type consumes the most stamina to perform a Charged Attack?",
+  "correct_answer":"Catalyst",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which character's Elemental Skill makes them unable to use Plunging Attacks and Charged Attacks for a short duration?",
+  "correct_answer":"Kamisato Ayato",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which Inazuman character uses talent books from Liyue?",
+  "correct_answer":"Kaedehara Kazuha",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What is the name of the upside-down growing tree that collects all of the information in Teyvat through Ley Lines, and acts as the root of Dendro power?",
+  "correct_answer":"Irminsul",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"How many enemies can drop the item 'Transoceanic Pearl'?",
+  "correct_answer":"10",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What class of Mystical Beasts does the Millennial Pearl Seahorse belong to?",
+  "correct_answer":"Fontemer Aberrants",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"The Traveler's adventures with the Aranara are recorded in which Gadget?",
+  "correct_answer":"Aranyaka",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What was the name of the ancient sea god defeated by Rex Lapis during the Archon War, also known as 'That Which Lies in the Deep'?",
+  "correct_answer":"Osial",
+  "difficulty":"Easy",
+  "category":"Genshin"
   }
 ]
