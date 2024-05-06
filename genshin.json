@@ -10,17 +10,17 @@
     "difficulty":"Medium",
     "category":"Genshin"
   },
-  { "question":"How many playable cryo characters are in the game as of 4.3?",
+  { "question":"How many playable cryo characters are in the game as of 4.6?",
     "correct_answer":"15",
     "difficulty":"Medium",
     "category":"Genshin"
   },
-  { "question":"What element and weapon combination is missing from the playable characters?",
+  { "question":"What element and weapon combination is missing from the playable characters, as of version 4.6?",
     "correct_answer":"Hydro Claymore",
     "difficulty":"Medium",
     "category":"Genshin"
   },
-  { "question":"Which Element has the least playable characters?",
+  { "question":"Which Element has the least playable characters, as of version 4.6?",
     "correct_answer":"Dendro",
     "difficulty":"Medium",
     "category":"Genshin"
@@ -82,7 +82,7 @@
   "category":"Genshin"
   }, 
   { "question":"What patch did yelan come out?",
-  "correct_answer":"2.8",
+  "correct_answer":"2.7",
   "difficulty":"Medium",
   "category":"Genshin"
   }, 
@@ -102,7 +102,7 @@
   "category":"Genshin"
   }, 
   { "question":"Who had the fastest rerun?",
-  "correct_answer":"Yoimiya",
+  "correct_answer":"Baizhu",
   "difficulty":"Hard",
   "category":"Genshin"
   }, 
@@ -247,7 +247,7 @@
   "difficulty":"Medium",
   "category":"Genshin"
   },
-  { "question":"Which weapon is not wielded by any Archon so far?",
+  { "question":"Which weapon is not wielded by any Archon so far, as of version 4.6?",
   "correct_answer":"Claymore",
   "difficulty":"Medium",
   "category":"Genshin"
@@ -305,11 +305,6 @@
   { "question":"The Black Serpents are exclusive to which region of the map?",
   "correct_answer":"The Chasm: Underground Mines",
   "difficulty":"Medium",
-  "category":"Genshin"
-  },
-  { "question":"Where is The Knave from?",
-  "correct_answer":"Fontaine",
-  "difficulty":"Easy",
   "category":"Genshin"
   },
   { "question":"What is the cost of a four-star character in Paimon's Bargains?",
@@ -402,14 +397,9 @@
   "difficulty":"Hard",
   "category":"Genshin"
   },
-  { "question":"What character story quests are prerequisites to progress the main Archon quests?",
-  "correct_answer":"Kamisato Ayaka, Razor & Yoimiya",
-  "difficulty":"Hard",
-  "category":"Genshin"
-  },
-  { "question":"In which character story quests does the character not appear as a trial character?",
-  "correct_answer":"Albedo, Neuvilette & Furina",
-  "difficulty":"Hard",
+  { "question":"How many character story quests are prerequisites to progress the main Archon quests?",
+  "correct_answer":"4",
+  "difficulty":"Medium",
   "category":"Genshin"
   },
   { "question":"Who was the first character to have a hangout and a story quest?",
@@ -553,7 +543,7 @@
   "category":"Genshin"
   },
   { "question":"How many artifact sets have a 2-piece effect of +18% ATK?",
-  "correct_answer":"7",
+  "correct_answer":"9",
   "difficulty":"Hard",
   "category":"Genshin"
   },
@@ -667,11 +657,6 @@
   "difficulty":"Hard",
   "category":"Genshin"
   },
-  { "question":"What is the element of Bosacius, Indarius, Bonanus and Menogias respectively?",
-  "correct_answer":"Electro, Pyro, Hydro, Geo",
-  "difficulty":"Hard",
-  "category":"Genshin"
-  },
   { "question":"Who taught Aberaku about the Dainichi Mikoshi?",
   "correct_answer":"Kairos",
   "difficulty":"Hard",
@@ -724,11 +709,6 @@
   },
   { "question":"What is another name for Khaenri'ah?",
   "correct_answer":"Dahri",
-  "difficulty":"Hard",
-  "category":"Genshin"
-  },
-  { "question":"What is the correct order of Samsara cycles according to the Narzissenkreuz ordo?",
-  "correct_answer":"Hyperborea, Natlantean, Remuria, Khraun-Arya",
   "difficulty":"Hard",
   "category":"Genshin"
   },
@@ -872,7 +852,7 @@
   "difficulty":"Medium",
   "category":"Genshin"
   },
-  { "question":"Who were cursed by immortality for 'sinning'?",
+  { "question":"Who were cursed with immortality for 'sinning'?",
   "correct_answer":"The people of Khaenri'ah",
   "difficulty":"Medium",
   "category":"Genshin"
@@ -895,6 +875,184 @@
   { "question":"Which character is known as the 'Eclipsing Star' and is a skilled martial artist proficient in Geo abilities?",
   "correct_answer":"Ningguang",
   "difficulty":"Medium",
+  "category":"Genshin"
+  }
+
+
+  ,
+  { "question":"What god was worshipped in Mondstadt alongside Barbatos in the past?",
+  "correct_answer":"Istaroth",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Where can Abyss Lectors and Abyss Heralds be found naturally spawning?",
+  "correct_answer":"Enkanomiya",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Before the events of Masquerade of the Guilty, citizens of Fontaine dissolved when exposed to...?",
+  "correct_answer":"Primordial Water",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which character's Utility Passive increases gliding speed?",
+  "correct_answer":"Xianyun",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Who is the only character, so far, to have a Hangout Quest with two acts?",
+  "correct_answer":"Noelle",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Remus was originally from where?",
+  "correct_answer":"Sumeru",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What was the name of The Grand Symphony, created by Remus to free humans from \"Fortuna\"?",
+  "correct_answer":"Phobos",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"What was the name of the ship constructed by Wriothesley as a precautionary rescue measure against the Prophecy?",
+  "correct_answer":"The Wingalet",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"How long does a Bond of Life last, if not cleared by healing or a Statue of The Seven?",
+  "correct_answer":"10 Minutes",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Who is considered the strongest Champion Duelist in Fontaine?",
+  "correct_answer":"Clorinde",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Who was responsible for recruiting Il Dottore, The Balladeer, and La Signora into the Fatui?",
+  "correct_answer":"Pierro",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which element cannot react with Geo, Anemo, or Cryo?",
+  "correct_answer":"Dendro",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What elemental vision was the previous Knave, Crucabena, known to wield?",
+  "correct_answer":"Hydro",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which character shares their birthday with Arataki Itto?",
+  "correct_answer":"Paimon",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What is the only 5-star food item in the game?",
+  "correct_answer":"Adeptus' Temptation",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Where were Remarkable Chests first introduced?",
+  "correct_answer":"Tsurumi Island",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Characters of Khaenri'ahn descent generally have pupils in the shape of what?",
+  "correct_answer":"A four-pointed star",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What was the title used by ancient Remurians to refer to their god, Remus?",
+  "correct_answer":"The Sebastos",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Who granted Chlothar Alberich his Abyssal power?",
+  "correct_answer":"The Sinner",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which weekly boss is immune to Anemo and Cryo damage?",
+  "correct_answer":"Andrius",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which in-game faction currently has the largest number of playable characters, as of version 4.6?",
+  "correct_answer":"The Knights of Favonius",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Where are Credit Coupons primarily used?",
+  "correct_answer":"The Fortress of Meropide",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Who introduced Credit Coupons to the Fortress of Meropide?",
+  "correct_answer":"Pantalone",
+  "difficulty":"Hard",
+  "category":"Genshin"
+  },
+  { "question":"Which playable character cannot be sent on expeditions?",
+  "correct_answer":"The Traveler",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"The Electro Gnosis was entrusted by Raiden Ei to whom?",
+  "correct_answer":"Yae Miko",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"The Gnoses were created from whose remains?",
+  "correct_answer":"The Third Descender",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"What caused the desertification of Sumeru's desert?",
+  "correct_answer":"A Divine Nail",
+  "difficulty":"Medium",
+  "category":"Genshin"
+  },
+  { "question":"Which weapon type consumes the most stamina to perform a Charged Attack?",
+  "correct_answer":"Catalyst",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which character's Elemental Skill makes them unable to use Plunging Attacks and Charged Attacks for a short duration?",
+  "correct_answer":"Kamisato Ayato",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"Which Inazuman character uses talent books from Liyue?",
+  "correct_answer":"Kaedehara Kazuha",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What is the name of the upside-down growing tree that collects all of the information in Teyvat through Ley Lines, and acts as the root of Dendro power?",
+  "correct_answer":"Irminsul",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"How many enemies can drop the item 'Transoceanic Pearl'?",
+  "correct_answer":"10",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What class of Mystical Beasts does the Millennial Pearl Seahorse belong to?",
+  "correct_answer":"Fontemer Aberrants",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"The Traveler's adventures with the Aranara are recorded in which Gadget?",
+  "correct_answer":"Aranyaka",
+  "difficulty":"Easy",
+  "category":"Genshin"
+  },
+  { "question":"What was the name of the ancient sea god defeated by Rex Lapis during the Archon War, also known as 'That Which Lies in the Deep'?",
+  "correct_answer":"Osial",
+  "difficulty":"Easy",
   "category":"Genshin"
   }
 ]
