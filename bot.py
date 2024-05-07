@@ -888,7 +888,7 @@ class Bot(commands.Bot):
   @commands.command()
   async def help(self, ctx: commands.Context):
     await ctx.send(
-      "To view a list of commands/functionality, visit: https://itssport.co/twiviabot"
+      "To view a list of commands/functionality, visit: https://www.itssport.co/twiviabot"
     )
 
   @commands.command()
