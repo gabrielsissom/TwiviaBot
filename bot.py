@@ -536,34 +536,34 @@ class Bot(commands.Bot):
     print(f'User id is | {self.user_id}')
 
   async def event_message(self, message):
+    #If message is from self, return
     if message.echo:
       return
 
     channel_state = self.get_channel_state(message.channel.name)
-    if channel_state['current_question']:
+    
+    if channel_state['current_question']: #if a question is active
       user_answer = message.content.strip().lower()
       correct_answer = channel_state['current_question']['answer'].lower(
       ) if channel_state['current_question'] else None
 
-      if (similarity(user_answer, correct_answer) >=
-          ANSWER_CLOSE) and (similarity(user_answer, correct_answer) <
+      #Check similarity between user answer and correct answer
+      user_answer_similary = similarity(user_answer, correct_answer)
+      
+      if (user_answer_similary >=
+          ANSWER_CLOSE) and (user_answer_similary <
                              ANSWER_CORRECTNESS):  #If user answers CLOSELY
-        user = message.author.name
         await message.channel.send(
-          f"{user} is close! {round(similarity(user_answer, correct_answer) * 100, 2)}% accurate."
+          f"{message.author.name} is close! {round(user_answer_similary * 100, 2)}% accurate."
         )
 
-      if similarity(
-          user_answer,
-          correct_answer) >= ANSWER_CORRECTNESS:  #If user answers CORRECTLY
-        user = message.author.name
-        channel = message.channel.name
-        add_score(channel, user, CORRECT_ANSWER_VALUE)
-        print(
-          f"[{channel}] {user} answered with {similarity(user_answer, correct_answer)} accuracy."
+      if user_answer_similary >= ANSWER_CORRECTNESS:  #If user answers CORRECTLY
+        add_score(message.channel.name, message.author.name, CORRECT_ANSWER_VALUE)
+        print( #console message
+          f"[{message.channel.name}] {message.author.name} answered with {user_answer_similary} accuracy."
         )
-        await message.channel.send(
-          f"{user} answered with {round(similarity(user_answer, correct_answer) * 100, 2)}% accuracy! Their score is now   {get_score(channel, user)}. Answer: {channel_state['current_question']['answer']}"
+        await message.channel.send( #chat message
+          f"{message.author.name} answered with {round(user_answer_similary * 100, 2)}% accuracy! Their score is now {get_score(message.channel.name, message.author.name)}. Answer: {channel_state['current_question']['answer']}"
         )
         channel_state['current_question'] = None
 
