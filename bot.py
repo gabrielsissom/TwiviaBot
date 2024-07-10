@@ -1,7 +1,6 @@
 import os, random, asyncio, html, json, psycopg2, time, requests, sys
 from twitchio.ext import commands
 from difflib import SequenceMatcher
-import discord
 
 #GLOBAL CONSTANTS
 DATABASE_URL = os.environ['DATABASE_URL']
@@ -653,7 +652,7 @@ class Bot(commands.Bot):
       channels_message = "TwiviaBot exists in: "
       for channel in active_channels:
         channels_message += (f'{channel}, ')
-      await ctx.send(channels_message)
+      print(channels_message)
 
   @commands.command()
   async def sub(self, ctx: commands.Context, channel_name: str = None):
