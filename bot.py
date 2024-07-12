@@ -1,10 +1,11 @@
-import os, random, asyncio, html, json, psycopg2, time, requests, sys
+import os, random, asyncio, json, psycopg2, time, requests, sys, openpyxl
 from twitchio.ext import commands
 from difflib import SequenceMatcher
 
 #GLOBAL CONSTANTS
 DATABASE_URL = os.environ['DATABASE_URL']
 DISCORD_WEBHOOK_URL = os.environ['DISCORD_WEBHOOK_URL']
+TRIVIA_FILE_NAME = 'trivia.xlsx'
 
 #GLOBAL SETTINGS
 HINT_CHARS_REVEALED = 0.4  # Scale between 0.0 and 1.0 where 1 reveals 100% of the answer.
@@ -25,32 +26,22 @@ BANNED_IN_ANSWER = ["ALL OF THE ABOVE"]
 REVEAL_IN_HINT = ["-", ",", "$", "%", ".", "/", "'", '"']
 
 CATEGORIES = {
-  "ALL": 0,
-  "GENERAL": 9,
-  "BOOKS": 10,
-  "FILMS": 11,
-  "MUSIC": 12,
-  "THEATRE": 13,
-  "TV": 14,
-  "VIDEOGAMES": 15,
-  "BOARDGAMES": 16,
-  "SCIENCE/NATURE": 17,
-  "COMPUTERS": 18,
-  "MATHEMATICS": 19,
-  "MYTHOLOGY": 20,
-  "SPORTS": 21,
-  "GEOGRAPHY": 22,
-  "HISTORY": 23,
-  "POLITICS": 24,
-  "ART": 25,
-  "CELEBRITIES": 26,
-  "ANIMALS": 27,
-  "VEHICLES": 28,
-  "COMICS": 29,
-  "GADGETS": 30,
-  "ANIME": 31,
-  "ANIMATION": 32,
-  "GENSHIN": 33
+  0: "General",
+  1: "Science & Nature",
+  2: "Geography",
+  3: "Entertainment",
+  4: "Sports & Leisure",
+  5: "Music",
+  6: "History & Holidays",
+  7: "Food & Drink",
+  8: "People & Places",
+  9: "Toys & Games",
+  10: "Religion & Mythology",
+  11: "Technology & Video Games",
+  12: "Art & Literature",
+  13: "Mathematics",
+  14: "Language",
+  15: "Genshin Impact"
 }
 
 
@@ -83,6 +74,7 @@ def setup_db():
   c.execute('''CREATE TABLE IF NOT EXISTS channel_categories (
                  channel TEXT PRIMARY KEY,
                  category TEXT,
+                 ids INTEGER[],
                  FOREIGN KEY (channel) REFERENCES channels (name)
              )''')
 
@@ -197,32 +189,79 @@ def set_channel_cooldown(channel_name, cooldown):
   c.close()
   conn.close()
 
+#Overwrites everything in the 'ids' collumn with new integer array (new_categories)
+# new_categories must be an array of integers
+def set_channel_category(channel_name, new_categories):
+  conn = get_db_connection()
+  c = conn.cursor()
+  c.execute(
+      '''
+      UPDATE channel_categories
+      SET ids = %s
+      WHERE channel = %s
+      ''', (new_categories, channel_name))
+  conn.commit()
+  c.close()
+  conn.close()
 
-def set_channel_category(channel_name, category):
+#Appends a new integer to the 'ids' collumn
+# new_category_id must be an integer
+def add_channel_category(channel_name, new_category_id: int):
   conn = get_db_connection()
   c = conn.cursor()
   c.execute(
     '''
-    INSERT INTO channel_categories (channel, category) 
-    VALUES (%s, %s) 
-    ON CONFLICT (channel) 
-    DO UPDATE SET category = EXCLUDED.category
-    ''', (channel_name, category))
+    UPDATE channel_categories
+    SET ids = array_append(ids, %s)
+    WHERE channel = %s
+    ''', (new_category_id, channel_name))
+  conn.commit()
+  c.close()
+  conn.close()
+
+def remove_channel_category(channel_name, value_to_remove):
+  """
+  Removes a specific value from the 'ids' array in the channel_categories table.
+
+  Args:
+      channel_name: The name of the channel.
+      value_to_remove: The integer value to remove from the 'ids' array.
+  """
+  conn = get_db_connection()
+  c = conn.cursor()
+  c.execute("""
+    UPDATE channel_categories
+    SET ids = array_remove(ids, %s)
+    WHERE channel = %s
+  """, (value_to_remove, channel_name))
   conn.commit()
   c.close()
   conn.close()
 
 
-def get_channel_category(channel_name):
+def get_channel_category_ids(channel_name):
   conn = get_db_connection()
   c = conn.cursor()
-  c.execute('SELECT category FROM channel_categories WHERE channel = %s',
+  c.execute('SELECT ids FROM channel_categories WHERE channel = %s',
             (channel_name, ))
   result = c.fetchone()
   c.close()
   conn.close()
-  return result[0] if result else 'ALL'  # Default cooldown is 30 seconds
+  if result[0]:
+    return result[0]
+  else:
+    return None
 
+def get_channel_categories(channel_name):
+  channel_category_ids = get_channel_category_ids(channel_name)
+  if channel_category_ids:
+    channel_categories = []
+    for id in channel_category_ids:
+      channel_categories.append(CATEGORIES[id])
+    return channel_categories
+  else:
+    #returns None if no categories are set
+    return None
 
 def add_channel(channel_name):
   conn = get_db_connection()
@@ -350,125 +389,78 @@ class Bot(commands.Bot):
     # self.current_question = None  # deprecated use channel_states
     self.channels = channels
 
-  async def get_question(self, channel_name, precategory=None):
-    api_url = 'https://opentdb.com/api.php?amount=5&type=multiple'
-    cat_ids = []
-    categories = ''
+  async def get_question(self, channel_name, precategory: str = None):
+    
+    categories = []
 
     # Use pre-determined category if provided
     if precategory != None:
-      if precategory.upper() in CATEGORIES:
-        categories = precategory.upper()
-      else:
-        categories = get_channel_category(channel_name)
-    else:
-      categories = get_channel_category(channel_name)
+      matched_category = None
+      for key, value in CATEGORIES.items():
+        if precategory.upper() == value.upper():
+          matched_category = key
+          break  # Exit the loop once a match is found
 
-    # If no category is provided, use channel's category list
-    for category in CATEGORIES:
-      if category in categories:
-        cat_ids.append(CATEGORIES[category])
+      if matched_category:
+        categories.append(matched_category)
+      else:
+        # If no valid category is provided, use channel's category list
+        check_for_none = get_channel_category_ids(channel_name)
+        if check_for_none:
+          categories.extend(check_for_none)
+    else:
+      # If category is not provided, use channel's category list
+      check_for_none = get_channel_category_ids(channel_name)
+      if check_for_none:
+        categories.extend(check_for_none)
 
     # Select a random category from channel's categories
-    id = random.choice(cat_ids)
-    if not 0 in cat_ids:
-      api_url = f"https://opentdb.com/api.php?amount=5&category={id}&type=multiple"
+    if len(categories) > 0:
+      selected_category_id = random.choice(categories)
+      #temporary 70% chance of selecting the general category
+      #since this category has 90% of the questions
+      if 0 in categories:
+        if random.randint(1, 100) <= 70:
+          selected_category_id = 0
+    else:
+      selected_category_id = random.choice(list(CATEGORIES.keys()))
+      #temporary 70% chance of selecting the general category
+      #since this category has 90% of the questions
+      if 0 in list(CATEGORIES.keys()):
+        if random.randint(1, 100) <= 70:
+          selected_category_id = 0
 
-    ## Genshin Trivia
-    if id == 33:
+    # Genshin Trivia
+    if selected_category_id == 15:
       with open("genshin.json", "r") as read_file:
         genshin_questions = json.load(read_file)
       question_data = random.choice(genshin_questions)
       return question_data
+    
+    #open workbook and select category sheet
+    trivia_workbook = openpyxl.load_workbook(TRIVIA_FILE_NAME)
+    selected_sheet = trivia_workbook[CATEGORIES[selected_category_id]]
+    
+    #select random row(question)
+    random_row = 192 #random.randint(2, selected_sheet.max_row)
+    random_row_array = [cell.value for cell in selected_sheet[random_row]]
 
-    api_successful = False  # Set to True if API request is successful
-    new_question_set_needed = True  # Set to False if a question set contains a suitable question
-    api_tries = 0
-    question_set_iteration = 0
+    #Create an array for answers
+    usable_answers = [random_row_array[3].strip()]
+    print(f"array size: {len(random_row_array)}")
+    if len(random_row_array) > 4:
+      for i in range(4, len(random_row_array)):
+        usable_answers.append(random_row_array[i].strip())
 
-    while (not api_successful) and (api_tries < MAX_API_TRIES) and (
-        new_question_set_needed):
-      response = requests.get(api_url)
-      if response.status_code == requests.codes.ok:
-        api_successful = True  # The API retrieved a set of 5 questions
-        results = response.json()['results']  # parse json once
-        question_set_iteration = 0
-        new_question_set_needed = False
-        # Checking for phrases banned in question and answer.
+    print(f"answers array: {usable_answers}")
 
-        # print(results) #DEBUG
-        while (question_set_iteration < 5):  # Iterate through the question set
+    #Format question for return
+    question_data = {'question_id': random_row_array[0], 'category': random_row_array[1].strip(), 'question': random_row_array[2].strip(), 'answer': usable_answers}
 
-          question_contains_banned_phrase = False
-          question_upper = results[question_set_iteration]['question'].upper()
-          for phrase in BANNED_IN_QUESTIONS:
-            if phrase in question_upper:
-              print(
-                f"[{channel_name}] ({question_set_iteration + 1} of 5) Question contained '{phrase}' | {results[question_set_iteration]['question']}"
-              )
-              question_contains_banned_phrase = True
-              break
-
-          answer_contains_banned_phrase = False
-          answer_upper = results[question_set_iteration]["correct_answer"].upper()
-          for phrase in BANNED_IN_ANSWER:
-            if phrase in answer_upper:
-              print(
-                f"[{channel_name}] ({question_set_iteration + 1} of 5) Answer contained '{phrase}' | {results[question_set_iteration]['correct_answer']}"
-              )
-              answer_contains_banned_phrase = True
-              break
-
-          # Questions containing 'NOT' in all caps are an edge-case, and should not
-          # be compared to the question with .upper()
-          question_contains_NOT = False
-          if "NOT" in results[question_set_iteration]["question"]:
-            print(
-              f"[{channel_name}] ({question_set_iteration + 1} of 5) Question contained 'NOT' | {results[question_set_iteration]['question']}"
-            )
-            question_contains_NOT = True
-
-          if not question_contains_banned_phrase and not answer_contains_banned_phrase and not question_contains_NOT:
-            print(
-              f"[{channel_name}] Found suitable question ({question_set_iteration + 1} of 5) | {results[question_set_iteration]}"
-            )
-            break
-          else:
-            # print(f"[{channel_name}] BANNED PHRASES IN (Q: {results[question_set_iteration]['question']} A: {results[question_set_iteration]['correct_answer']})")
-            question_set_iteration += 1
-            if question_set_iteration >= 5:
-              new_question_set_needed = True
-
-      else:
-        api_successful = False
-        if api_tries < MAX_API_TRIES:
-          print(
-            f"[{channel_name}] API Error: {response.status_code} | {response.text}"
-          )
-          print(
-            f"[{channel_name}] Retrying... ({api_tries + 1} of {MAX_API_TRIES})"
-          )
-          api_tries += 1
-          await asyncio.sleep(3)
-
-        else:
-          print(f"[{channel_name}] API failure: Question failed.")
-          return None
-
-    # parsed_response = json.loads(response.text) #DEBUG
-    # print(parsed_response) #DEBUG
-    question_data = results[question_set_iteration]
-    # print(question_data) #DEBUG
+    #close workbook
+    trivia_workbook.close()
+    
     return question_data
-
-  def format_question(self, question):
-    formatted_question = html.unescape(question['question'])
-    formatted_answer = html.unescape(question['correct_answer'])
-    formatted_category = html.unescape(question['category'])
-    question['question'] = formatted_question
-    question['correct_answer'] = formatted_answer
-    question['category'] = formatted_category
-    return question
 
   def get_channel_state(self, channel_name):
     if channel_name not in self.channel_states:
@@ -539,29 +531,32 @@ class Bot(commands.Bot):
     if message.echo:
       return
 
+    if message.author.name != 'itssport':
+      return
+
     channel_state = self.get_channel_state(message.channel.name)
-    
-    if channel_state['current_question']: #if a question is active
+
+    if channel_state['current_question']:  #if a question is active
       user_answer = message.content.strip().lower()
       correct_answer = channel_state['current_question']['answer'].lower(
       ) if channel_state['current_question'] else None
 
       #Check similarity between user answer and correct answer
       user_answer_similary = similarity(user_answer, correct_answer)
-      
-      if (user_answer_similary >=
-          ANSWER_CLOSE) and (user_answer_similary <
-                             ANSWER_CORRECTNESS):  #If user answers CLOSELY
+
+      if (user_answer_similary >= ANSWER_CLOSE) and (
+          user_answer_similary < ANSWER_CORRECTNESS):  #If user answers CLOSELY
         await message.channel.send(
           f"{message.author.name} is close! {round(user_answer_similary * 100, 2)}% accurate."
         )
 
       if user_answer_similary >= ANSWER_CORRECTNESS:  #If user answers CORRECTLY
-        add_score(message.channel.name, message.author.name, CORRECT_ANSWER_VALUE)
-        print( #console message
+        add_score(message.channel.name, message.author.name,
+                  CORRECT_ANSWER_VALUE)
+        print(  #console message
           f"[{message.channel.name}] {message.author.name} answered with {user_answer_similary} accuracy."
         )
-        await message.channel.send( #chat message
+        await message.channel.send(  #chat message
           f"{message.author.name} answered with {round(user_answer_similary * 100, 2)}% accuracy! Their score is now {get_score(message.channel.name, message.author.name)}. Answer: {channel_state['current_question']['answer']}"
         )
         channel_state['current_question'] = None
@@ -597,40 +592,33 @@ class Bot(commands.Bot):
     if not channel_state[
         'current_question']:  # Checking if the current_question is None (i.e. no question is active)
       if not cat == None:  # If a category is provided
-        question_data = await self.get_question(channel_name, cat)
+        category_choice = ctx.message.content[7:].strip().lower()
+        question_data = await self.get_question(channel_name, category_choice)
       else:  # If a cateogry is not provided
         question_data = await self.get_question(channel_name)
 
       if question_data == None:  # If get_question returns None, API failed.
-        print(f"[{channel_name}] API failure: Question failed.")
-        await ctx.send("Trivia API failed. Try again.")
+        print(f"[{channel_name}] Question failure: Question failed.")
+        await ctx.send("Trivia failed. Try again.")
         return
-
-      question_data = self.format_question(question_data)
-
+        
+      #Add trivia data to channel state
       channel_state['current_question'] = {
+        "question_id": question_data['question_id'],
         "category": question_data["category"],
         "question": question_data["question"],
-        "answer": question_data["correct_answer"],
-        "difficulty": question_data["difficulty"]
+        "answer": question_data["answer"]
       }
 
-      if "(" in channel_state['current_question']["answer"]:
-        print(
-          f"[{ctx.channel.name}] Removing Parentheses From: {channel_state['current_question']['answer']}"
-        )
-        channel_state['current_question']["answer"] = channel_state[
-          'current_question'][
-            "answer"][:channel_state['current_question']["answer"].index("(")]
-
+      #Console question details
       print(
         f"[{ctx.channel.name}] Trivia Game Started by {ctx.author.name} [category: "
-        + channel_state['current_question']['category'] + "]: Q: " +
+        + channel_state['current_question']['category'] + f"]: Q ({channel_state['current_question']['question_id']}): " +
         channel_state['current_question']["question"] + " A: " +
         channel_state['current_question']["answer"])
 
       await ctx.send(
-        f"Trivia: [Category - {channel_state['current_question']['category']}] [Difficulty - {channel_state['current_question']['difficulty'].upper()}] Q: "
+        f"[Category - {channel_state['current_question']['category']}] Question: "
         + channel_state['current_question']["question"])
       await self.check_answer(ctx)
 
@@ -793,9 +781,12 @@ class Bot(commands.Bot):
     if (ctx.author.is_mod) or (ctx.author.name == 'itssport'):
       if cooldown is not None:
         if cooldown >= 0:
-          set_channel_cooldown(ctx.channel.name, cooldown)
-          await ctx.send(
-            f"Cooldown set to {cooldown} seconds for {ctx.channel.name}.")
+          if cooldown <= 1000000:
+            set_channel_cooldown(ctx.channel.name, cooldown)
+            await ctx.send(
+              f"Cooldown set to {cooldown} seconds for {ctx.channel.name}.")
+          else:
+            await ctx.send("Cooldown may not be greater than 1,000,000 seconds.")
         else:
           await ctx.send("Cooldown may not be negative.")
       else:
@@ -827,58 +818,50 @@ class Bot(commands.Bot):
       )
 
   @commands.command()
-  async def category(self, ctx: commands.Context, category: str = None):
+  async def category(self, ctx: commands.Context, are_args: str = None):
     channel_name = ctx.channel.name
 
     if (ctx.author.is_mod) or (ctx.author.name == 'itssport'):
-      if not category == None:
-        if "," in category:
-          split_categories = category.split(",")
-        else:
-          split_categories = [category]
-        new_categories = ""
-        invalid_categories = ""
+      if are_args:
+        
+        category_choice = ctx.message.content[9:].strip().lower()
+        matched_category = None
+        
+        for key, value in CATEGORIES.items():
+          if category_choice.upper() == value.upper():
+            matched_category = key
+            break  # Exit the loop once a match is found
 
-        for i in split_categories:
-          if i.upper() in CATEGORIES:
-            new_categories += f" {i.upper()}"
+        if matched_category:
+          user_categories = get_channel_category_ids(channel_name)
+          if user_categories and (matched_category in user_categories):
+            remove_channel_category(channel_name, int(matched_category))
+            await ctx.send(f"{CATEGORIES[matched_category]} has been removed from {ctx.channel.name}'s categories.")
           else:
-            invalid_categories += f" {i.upper()}"
-
-        if "ALL" in new_categories:
-          new_categories = "ALL"
-          invalid_categories = ""
-
-        print(f"[{ctx.channel.name}] Category update: {new_categories}")
-
-        if not invalid_categories == "":
-          await ctx.send(
-            f"The following categories were invalid: {invalid_categories}")
-
-        if not new_categories == "":
-          set_channel_category(ctx.channel.name, new_categories)
-
-        print(
-          f"[{channel_name}] Categories set to {get_channel_category(channel_name)}"
-        )
-        await ctx.send(
-          f"Categories set to {get_channel_category(channel_name)} for {ctx.channel.name}."
-        )
+            add_channel_category(channel_name, int(matched_category))
+            await ctx.send(f"{CATEGORIES[matched_category]} has been added to {ctx.channel.name}'s categories.")
+        else:
+          await ctx.send(f"Invalid category: {category_choice}. To see a list of valid categories, use '%categories'.")
       else:
-        category = get_channel_category(channel_name)
-        await ctx.send(
-          f"{ctx.channel.name}'s trivia categories are set to {get_channel_category(ctx.channel.name)}."
-        )
+        are_any_cateogries = get_channel_categories(channel_name)
+        
+        if are_any_cateogries:
+          await ctx.send(f"{ctx.channel.name}'s trivia categories are set to {are_any_cateogries}.")
+        
+        else:
+          await ctx.send(f"{ctx.channel.name}'s trivia categories are not set; All categories will be used. Do '%category [category_name]' to set categories.")
+          
     else:
-      category = get_channel_category(channel_name)
-      await ctx.send(
-        f"{ctx.channel.name}'s trivia categories are set to {get_channel_category(ctx.channel.name)}."
-      )
+      are_any_cateogries = get_channel_categories(channel_name)
+      if are_any_cateogries:
+        await ctx.send(f"{ctx.channel.name}'s trivia categories are set to {are_any_cateogries}.")
+      else:
+        await ctx.send(f"{ctx.channel.name}'s trivia categories are not set; All categories will be used. Do '%category [category_name]' to set categories.")
 
   @commands.command()
   async def categories(self, ctx: commands.Context):
     all_cats = ""
-    for category in CATEGORIES:
+    for category in CATEGORIES.values():
       all_cats += f"{category}, "
     all_cats = all_cats[:-2]
 
@@ -914,7 +897,6 @@ def main():
   twiviaBot = Bot(channels)
   print("[STARTUP] starting bot...")
   twiviaBot.run()
-  print("[STARTUP] bot started.")
 
 
 if __name__ == "__main__":

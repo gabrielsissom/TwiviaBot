@@ -40,26 +40,13 @@ A trivia game bot for your Twitch chat. To get started, visit [TwiviaBot's chann
 - Only the **channel owner** or a **moderator** of the channel may modify the channel cooldown. For all other users, the command will display the total and remaining cooldown for the trivia game. 
 
 ### %category - Displays/Modifies the trivia question categories for the channel.
-- To modify a channel's categories, use the command `%category [category]`. 
-- To select more than one category, separate each category with a commma and **NO SPACES**. ex: `%category anime,general,videogames` 
-- To return to all categories, set the categories to 'all'. ex: `%category all`.
+- To add or remove a category, use the command `%category [category]`.
 - Only the **channel owner** or a **moderator** of the channel may modify the channel categories. For all other users, the command will display the channel's selected categories. 
 
 ### %categories - Displays a list of all selectable categories.
-- Available categories: ALL, GENERAL, BOOKS, FILMS, MUSIC, THEATRE, TV, VIDEOGAMES, BOARDGAMES, SCIENCE/NATURE, COMPUTERS, MATHEMATICS, MYTHOLOGY, SPORTS, GEOGRAPHY, HISTORY, POLITICS, ART, CELEBRITIES, ANIMALS, VEHICLES, COMICS, GADGETS, ANIME, ANIMATION. 
 
 ## Resources:
 
-Bot made using [TwitchIO](https://twitchio.dev/en/latest/index.html). 
+Want to contribute to [TwiviaBot's question database](https://docs.google.com/spreadsheets/d/157Gb7JkwZvq26bz_wJVCn4x3H-iqNZ59/edit?usp=sharing&ouid=111078275511657347073&rtpof=true&sd=true)?
 
-Trivia question [database](https://opentdb.com/).
-
-To run bot.py you will need the following environment variables:
-
-```
-TMI_TOKEN=oauth:pjwk******************
-CLIENT_ID=lgs0w*******************
-BOT_NICK=TwiviaBot 
-```
-
-You can get your own token, client ID, and bot with a new (or your own) twitch account.
+Bot made using [TwitchIO](https://twitchio.dev/en/latest/index.html).
