@@ -12,3 +12,4 @@ Pipfile.lock
 data_transfer.py
 .vscode/
 .breakpoints
+.DS_Store
