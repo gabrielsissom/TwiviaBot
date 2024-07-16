@@ -2,6 +2,16 @@ import os, random, asyncio, json, psycopg2, time, requests, sys, openpyxl
 from twitchio.ext import commands
 from difflib import SequenceMatcher
 
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
+
+#GOOGLE API
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
+TRIVIA_SPREADSHEET_ID = "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+
 #GLOBAL CONSTANTS
 DATABASE_URL = os.environ['DATABASE_URL']
 DISCORD_WEBHOOK_URL = os.environ['DISCORD_WEBHOOK_URL']
@@ -15,15 +25,8 @@ ANSWER_CLOSE = 0.8  # Scale between 0.0 and 1.0 where 1.0 is an exact match. Ann
 ANSWER_CORRECTNESS = 0.9  # Scale between 0.0 and 1.0 where 1.0 is an exact match.
 CORRECT_ANSWER_VALUE = 1  # Number of points to award for a correct question.
 BOT_PREFIX = '%'  # Token required before each command
-MAX_API_TRIES = 3  # Number of times to try getting a question set before giving up.
 
-BANNED_IN_QUESTIONS = [
-  "WHICH OF", "WHICH ONE OF", "OF THE FOLLOWING", "OUT OF THESE"
-]
-
-BANNED_IN_ANSWER = ["ALL OF THE ABOVE"]
-
-REVEAL_IN_HINT = ["-", ",", "$", "%", ".", "/", "'", '"']
+REVEAL_IN_HINT = ["-", ",", "$", "%", ".", "/", "'", '"', '&', '(', ')']
 
 CATEGORIES = {
   0: "General",
@@ -32,15 +35,6 @@ CATEGORIES = {
   3: "Entertainment",
   4: "Sports & Leisure",
   5: "Music",
-  6: "History & Holidays",
-  7: "Food & Drink",
-  8: "People & Places",
-  9: "Toys & Games",
-  10: "Religion & Mythology",
-  11: "Technology & Video Games",
-  12: "Art & Literature",
-  13: "Mathematics",
-  14: "Language",
   15: "Genshin Impact"
 }
 
@@ -73,7 +67,6 @@ def setup_db():
 
   c.execute('''CREATE TABLE IF NOT EXISTS channel_categories (
                  channel TEXT PRIMARY KEY,
-                 category TEXT,
                  ids INTEGER[],
                  FOREIGN KEY (channel) REFERENCES channels (name)
              )''')
@@ -247,7 +240,7 @@ def get_channel_category_ids(channel_name):
   result = c.fetchone()
   c.close()
   conn.close()
-  if result[0]:
+  if result:
     return result[0]
   else:
     return None
@@ -429,33 +422,26 @@ class Bot(commands.Bot):
       if 0 in list(CATEGORIES.keys()):
         if random.randint(1, 100) <= 70:
           selected_category_id = 0
-
-    # Genshin Trivia
-    if selected_category_id == 15:
-      with open("genshin.json", "r") as read_file:
-        genshin_questions = json.load(read_file)
-      question_data = random.choice(genshin_questions)
-      return question_data
     
     #open workbook and select category sheet
     trivia_workbook = openpyxl.load_workbook(TRIVIA_FILE_NAME)
     selected_sheet = trivia_workbook[CATEGORIES[selected_category_id]]
     
     #select random row(question)
-    random_row = 192 #random.randint(2, selected_sheet.max_row)
+    random_row = random.randint(2, selected_sheet.max_row)
     random_row_array = [cell.value for cell in selected_sheet[random_row]]
-
+    
+    #Remove None values
+    raw_question_data_array = [x for x in random_row_array if x is not None]
+    
     #Create an array for answers
-    usable_answers = [random_row_array[3].strip()]
-    print(f"array size: {len(random_row_array)}")
-    if len(random_row_array) > 4:
-      for i in range(4, len(random_row_array)):
-        usable_answers.append(random_row_array[i].strip())
-
-    print(f"answers array: {usable_answers}")
+    usable_answers = [raw_question_data_array[3].strip()]
+    if len(raw_question_data_array) > 4:
+      for i in range(4, len(raw_question_data_array)):
+        usable_answers.append(raw_question_data_array[i].strip())
 
     #Format question for return
-    question_data = {'question_id': random_row_array[0], 'category': random_row_array[1].strip(), 'question': random_row_array[2].strip(), 'answer': usable_answers}
+    question_data = {'question_id': int(raw_question_data_array[0]), 'category': raw_question_data_array[1].strip(), 'question': raw_question_data_array[2].strip(), 'answer': usable_answers}
 
     #close workbook
     trivia_workbook.close()
@@ -487,7 +473,7 @@ class Bot(commands.Bot):
                              timeout=TIME_BEFORE_HINT)
     except asyncio.TimeoutError:
       if channel_state['current_question']:
-        answer = channel_state['current_question']["answer"]
+        answer = channel_state['current_question']["answer"][0]
         revealed_chars = int(len(answer) * HINT_CHARS_REVEALED) + 1
 
         # Select random indices to reveal
@@ -511,7 +497,7 @@ class Bot(commands.Bot):
       if channel_state[
           'current_question']:  # If the question hasn't been answered yet
         await ctx.send("Time's up! The correct answer was: " +
-                       channel_state['current_question']["answer"])
+                       channel_state['current_question']['answer'][0])
         print(
           f"[{ctx.channel.name}] Time Up | A: {channel_state['current_question']['answer']}"
         )
@@ -538,31 +524,37 @@ class Bot(commands.Bot):
 
     if channel_state['current_question']:  #if a question is active
       user_answer = message.content.strip().lower()
-      correct_answer = channel_state['current_question']['answer'].lower(
-      ) if channel_state['current_question'] else None
+      correct_answer_array = channel_state['current_question']['answer'] if channel_state['current_question'] else None
 
-      #Check similarity between user answer and correct answer
-      user_answer_similary = similarity(user_answer, correct_answer)
+      #Check similarity between user answer and correct answers
+      user_answer_similarity = 0
+      for answer in correct_answer_array:
+        check_similarity = similarity(user_answer, answer.lower())
+        if check_similarity > user_answer_similarity:
+          user_answer_similarity = check_similarity
+        
 
-      if (user_answer_similary >= ANSWER_CLOSE) and (
-          user_answer_similary < ANSWER_CORRECTNESS):  #If user answers CLOSELY
+      if (user_answer_similarity >= ANSWER_CLOSE) and (
+          user_answer_similarity < ANSWER_CORRECTNESS):  #If user answers CLOSELY
         await message.channel.send(
-          f"{message.author.name} is close! {round(user_answer_similary * 100, 2)}% accurate."
+          f"{message.author.name} is close! {round(user_answer_similarity * 100, 2)}% accurate."
         )
 
-      if user_answer_similary >= ANSWER_CORRECTNESS:  #If user answers CORRECTLY
+      if user_answer_similarity >= ANSWER_CORRECTNESS:  #If user answers CORRECTLY
         add_score(message.channel.name, message.author.name,
                   CORRECT_ANSWER_VALUE)
         print(  #console message
-          f"[{message.channel.name}] {message.author.name} answered with {user_answer_similary} accuracy."
+          f"[{message.channel.name}] {message.author.name} answered with {user_answer_similarity} accuracy."
         )
         await message.channel.send(  #chat message
-          f"{message.author.name} answered with {round(user_answer_similary * 100, 2)}% accuracy! Their score is now {get_score(message.channel.name, message.author.name)}. Answer: {channel_state['current_question']['answer']}"
+          f"{message.author.name} answered with {round(user_answer_similarity * 100, 2)}% accuracy! Their score is now {get_score(message.channel.name, message.author.name)}. Answer: {channel_state['current_question']['answer'][0]}"
         )
         channel_state['current_question'] = None
 
     await self.handle_commands(message)
 
+
+  # %trivia
   @commands.command()
   async def trivia(self, ctx: commands.Context, cat: str = None):
     channel_name = ctx.channel.name
@@ -579,7 +571,6 @@ class Bot(commands.Bot):
 
     cooldown = get_channel_cooldown(channel_name)
     time_since_last_trivia = time.time() - channel_state['last_trivia']
-    # print(time_since_last_trivia) #Debug
 
     if time_since_last_trivia < cooldown:
       await ctx.send(
@@ -603,19 +594,21 @@ class Bot(commands.Bot):
         return
         
       #Add trivia data to channel state
+      print(f"question data: {question_data}")
+      print(f"channel state before: {channel_state}")
       channel_state['current_question'] = {
         "question_id": question_data['question_id'],
         "category": question_data["category"],
         "question": question_data["question"],
         "answer": question_data["answer"]
       }
+      print(f"channel state after: {channel_state}")
 
       #Console question details
       print(
         f"[{ctx.channel.name}] Trivia Game Started by {ctx.author.name} [category: "
         + channel_state['current_question']['category'] + f"]: Q ({channel_state['current_question']['question_id']}): " +
-        channel_state['current_question']["question"] + " A: " +
-        channel_state['current_question']["answer"])
+        channel_state['current_question']["question"] + f" A: {channel_state['current_question']['answer']}")
 
       await ctx.send(
         f"[Category - {channel_state['current_question']['category']}] Question: "
@@ -625,14 +618,16 @@ class Bot(commands.Bot):
       if channel_state[
           'current_question']:  # If the question hasn't been answered yet
         await ctx.send("Time's up! The correct answer was: " +
-                       channel_state['current_question']["answer"])
+                       channel_state['current_question']["answer"][0])
         print(
-          f"[{ctx.channel.name}] Time Up | A: {channel_state['current_question']['answer']}"
+          f"[{ctx.channel.name}] Time Up | A: {channel_state['current_question']['answer'][0]}"
         )
         channel_state['current_question'] = None
     else:
       await ctx.send("A trivia question is already active!")
 
+
+  # %channels
   @commands.command()
   async def channels(self, ctx: commands.Context):
     if ctx.author.name == 'itssport':
@@ -642,6 +637,8 @@ class Bot(commands.Bot):
         channels_message += (f'{channel}, ')
       print(channels_message)
 
+
+  # %sub
   @commands.command()
   async def sub(self, ctx: commands.Context, channel_name: str = None):
     if (ctx.author.name == 'itssport'):
@@ -654,6 +651,8 @@ class Bot(commands.Bot):
     else:
       await ctx.send("You do not have permission to use this command.")
 
+
+  # %unsub
   @commands.command()
   async def unsub(self, ctx: commands.Context, channel_name: str = None):
     if (ctx.author.name == 'itssport'):
@@ -666,6 +665,8 @@ class Bot(commands.Bot):
     else:
       await ctx.send("You do not have permission to use this command.")
 
+
+  # %join
   @commands.command()
   async def join(self, ctx: commands.Context):
     channel_name = ctx.author.name
@@ -683,6 +684,8 @@ class Bot(commands.Bot):
     else:
       await ctx.send("This command may only be used in TwiviaBot's chat.")
 
+
+  # %forcejoin
   @commands.command()
   async def forcejoin(self, ctx: commands.Context, channel_name: str = None):
     if ctx.author.name == 'itssport' and not channel_name == None:
@@ -697,6 +700,8 @@ class Bot(commands.Bot):
       else:
         await ctx.send(f"Already in channel {channel_name}")
 
+
+  # %part
   @commands.command()
   async def part(self, ctx: commands.Context):
     channel_name = ctx.author.name
@@ -712,6 +717,8 @@ class Bot(commands.Bot):
     else:
       await ctx.send("This command may only be used in TwiviaBot's chat.")
 
+
+  # %forcepart
   @commands.command()
   async def forcepart(self, ctx: commands.Context, channel_name: str = None):
     if ctx.author.name == 'itssport' and not channel_name == None:
@@ -724,11 +731,15 @@ class Bot(commands.Bot):
       print(f"TwiviaBot has left channel {channel_name}.")
       await ctx.send(f"TwiviaBot has left channel {channel_name}.")
 
+
+  # %points
   @commands.command()
   async def points(self, ctx: commands.Context):
     await ctx.send(f'The current points of {ctx.author.name} is ' +
                    str(get_score(ctx.channel.name, ctx.author.name)))
 
+
+  # %leaderboard
   @commands.command()
   async def leaderboard(self, ctx: commands.Context):
     top_users = get_top_users(ctx.channel.name)
@@ -737,6 +748,8 @@ class Bot(commands.Bot):
       leaderboard_message += f"{idx}. {user[0]} - {user[1]} points | \n"
     await ctx.send(leaderboard_message)
 
+
+  # %game
   @commands.command()
   async def game(self, ctx: commands.Context, arg: str = None):
     if (ctx.author.name == ctx.channel.name) or (ctx.author.name
@@ -762,18 +775,21 @@ class Bot(commands.Bot):
     else:
       await ctx.send("This command may only be used by the channel owner.")
 
+
+  # %skip
   @commands.command()
   async def skip(self, ctx: commands.Context):
     channel_state = self.get_channel_state(ctx.channel.name)
     if ctx.author.is_mod or ctx.author.name == 'itssport':
       if not channel_state['current_question'] == None:
-        await ctx.send('Question skipped. A: ' +
-                       channel_state['current_question']["answer"])
+        await ctx.send(f"Question skipped. A: {channel_state['current_question']['answer'][0]}")
         print(f"[{ctx.channel.name}] Question skipped by {ctx.author.name}")
         channel_state['current_question'] = None
     else:
       await ctx.send("You must be a moderator to use this command.")
 
+
+  # %cooldown
   @commands.command()
   async def cooldown(self, ctx: commands.Context, cooldown: int = None):
     channel_state = self.get_channel_state(ctx.channel.name)
@@ -817,6 +833,8 @@ class Bot(commands.Bot):
         f"{ctx.channel.name}'s trivia cooldown is set to {get_channel_cooldown(ctx.channel.name)} seconds. [{cooldown - int(time_since_last_trivia)}s remaining]"
       )
 
+
+  # %category
   @commands.command()
   async def category(self, ctx: commands.Context, are_args: str = None):
     channel_name = ctx.channel.name
@@ -858,6 +876,8 @@ class Bot(commands.Bot):
       else:
         await ctx.send(f"{ctx.channel.name}'s trivia categories are not set; All categories will be used. Do '%category [category_name]' to set categories.")
 
+
+  # %categories
   @commands.command()
   async def categories(self, ctx: commands.Context):
     all_cats = ""
@@ -867,12 +887,16 @@ class Bot(commands.Bot):
 
     await ctx.send(f"Available categories: {all_cats}.")
 
+
+  # %help
   @commands.command()
   async def help(self, ctx: commands.Context):
     await ctx.send(
       "To view a list of commands/functionality, visit: https://www.itssport.co/twiviabot"
     )
 
+
+  # %announce
   @commands.command()
   async def announce(self, ctx: commands.Context):
     if ctx.author.name == 'itssport':
@@ -887,14 +911,23 @@ class Bot(commands.Bot):
 
 
 def main():
+
+  #Initialize DB if not already created
   setup_db()
+
+  # Load channels into memory
   channels = get_saved_channels()
+
+  # Ensure TwiviaBot is in the channels
   if 'twiviabot' not in channels:
     add_channel('twiviabot')
     channels = get_saved_channels()
     print("[STARTUP] twiviabot not found in channels list on boot, re-added.")
+
+  # Initialize TwiviaBot
   print("[STARTUP] loading channels...")
   twiviaBot = Bot(channels)
+  # Run TwiviaBot
   print("[STARTUP] starting bot...")
   twiviaBot.run()
 
