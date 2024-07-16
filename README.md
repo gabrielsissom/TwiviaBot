@@ -9,13 +9,11 @@ A trivia game bot for your Twitch chat. To get started, visit [TwiviaBot's chann
 ## IMPORTANT: Many of the changes detailed below are a WORK IN PROGRESS, and may not work for every question. The questions are being updated over time to support this functionality. You can report incorrect/broken questions in my [Discord server](https://www.discord.gg/hMcbSTFCnU)
 
 ## Multi-correct answers:
-  ### Questions can now have multiple correct answers. This enables some new question types, as well as some quality of life changes. 
 
+  - Questions can now have multiple correct answers. This enables some new question types, as well as some quality of life changes.
+  - Answers that have multiple spellings will accept other variants. 
   - Answers that are numbers like '2' will also accept 'two' and vice versa.
   ![Example](/images/two.png)
-
-  - Answers that have multiple spellings will accept other variants.
-
   - Questions may ask for one of many possible answers.
   ![Example](/images/garlic.png)
 
