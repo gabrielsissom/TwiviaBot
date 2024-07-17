@@ -202,15 +202,23 @@ def set_channel_category(channel_name, new_categories):
 def add_channel_category(channel_name, new_category_id: int):
   conn = get_db_connection()
   c = conn.cursor()
-  c.execute(
-    '''
-    UPDATE channel_categories
-    SET ids = array_append(ids, %s)
-    WHERE channel = %s
-    ''', (new_category_id, channel_name))
+  c.execute('SELECT ids FROM channel_categories WHERE channel = %s', (channel_name,))
+  result = c.fetchone()
+
+  if result:
+      # Channel exists, update the ids array
+      existing_ids = result[0]
+      if new_category_id not in existing_ids:
+          existing_ids.append(new_category_id)
+          c.execute('UPDATE channel_categories SET ids = %s WHERE channel = %s', (existing_ids, channel_name))
+  else:
+      # Channel does not exist, create a new entry
+      c.execute('INSERT INTO channel_categories (channel, ids) VALUES (%s, %s)', (channel_name, [new_category_id]))
+
   conn.commit()
   c.close()
   conn.close()
+
 
 def remove_channel_category(channel_name, value_to_remove):
   """
@@ -517,9 +525,6 @@ class Bot(commands.Bot):
     if message.echo:
       return
 
-    if message.author.name != 'itssport':
-      return
-
     channel_state = self.get_channel_state(message.channel.name)
 
     if channel_state['current_question']:  #if a question is active
@@ -594,15 +599,12 @@ class Bot(commands.Bot):
         return
         
       #Add trivia data to channel state
-      print(f"question data: {question_data}")
-      print(f"channel state before: {channel_state}")
       channel_state['current_question'] = {
         "question_id": question_data['question_id'],
         "category": question_data["category"],
         "question": question_data["question"],
         "answer": question_data["answer"]
       }
-      print(f"channel state after: {channel_state}")
 
       #Console question details
       print(

@@ -4,9 +4,13 @@ A trivia game bot for your Twitch chat. To get started, visit [TwiviaBot's chann
 
 ![Join Image](/images/join.png)
 
+
+
 # TwiviaBot 2.0 Patch Notes:
 
+
 ## IMPORTANT: Many of the changes detailed below are a WORK IN PROGRESS, and may not work for every question. The questions are being updated over time to support this functionality. You can report incorrect/broken questions in my [Discord server](https://www.discord.gg/hMcbSTFCnU)
+
 
 ## Multi-correct answers:
 
@@ -17,10 +21,12 @@ A trivia game bot for your Twitch chat. To get started, visit [TwiviaBot's chann
   - Questions may ask for one of many possible answers.
   ![Example](/images/garlic.png)
 
+
 ## NEW Questions and Categories: 
   - A new set of 45,000+ questions are in the process of being added/validated. 
   - Categories are being re-worked and improved, so ensure you double-check your channel's set categories using %category. (7 categories at launch, 9 more coming)
   - Note: the %category command has been slightly reworked as well, read more on that below.
+  - 
 
 ## Contribution:
   - All TwiviaBot Questions are now being hosted online in a [Google Spreadsheet](https://docs.google.com/spreadsheets/d/157Gb7JkwZvq26bz_wJVCn4x3H-iqNZ59/edit?usp=sharing&ouid=111078275511657347073&rtpof=true&sd=true) where users can contribute/comment. 
@@ -29,6 +35,7 @@ A trivia game bot for your Twitch chat. To get started, visit [TwiviaBot's chann
   - If you'd like to contribute a LOT more than just a few questions or help validate question data, you can also inquiry about edit permissions in the [Discord server](https://www.discord.gg/hMcbSTFCnU). 
 
 end of patch notes
+
 
 
 # Commands:
