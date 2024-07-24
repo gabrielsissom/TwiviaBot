@@ -1,16 +1,18 @@
-import os, random, asyncio, json, psycopg2, time, requests, sys, openpyxl
+import os, random, asyncio, psycopg2, time, requests, sys, threading
 from twitchio.ext import commands
 from difflib import SequenceMatcher
 
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 #GOOGLE API
+SERVICE_ACCOUNT_FILE = 'credentials.json'
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
-TRIVIA_SPREADSHEET_ID = "1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgvE2upms"
+
+credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+TRIVIA_SPREADSHEET_ID = "1PJoXgEcnBGiFa60_I-YvuWdb9PpnXENzsj_WAoSTmNQ"
 
 #GLOBAL CONSTANTS
 DATABASE_URL = os.environ['DATABASE_URL']
@@ -87,26 +89,61 @@ def setup_db():
   conn.close()
 
 
-class DiscordWebhookStream(object):
-
-  def __init__(self, webhook_url):
-    self.webhook_url = webhook_url
+class DiscordWebhookStream:
+  def __init__(self, webhook_url, batch_interval=2):
+      self.webhook_url = webhook_url
+      self.buffer = ""
+      self.lock = threading.Lock()
+      self.batch_interval = batch_interval
+      self.stop_event = threading.Event()
+      self.thread = threading.Thread(target=self._send_batches)
+      self.thread.start()
 
   def write(self, message):
-    # Send message to Discord webhook
-    payload = {
-      'content': f"```{message}```",
-      'username': 'TwiviaBot',
-      'avatar_url': 'https://i.imgur.com/3qA9RkH.png'
-    }
-    requests.post(self.webhook_url, json=payload)
+      with self.lock:
+          self.buffer += message
 
+  def flush(self):
+      with self.lock:
+          self._send_message(self.buffer)
+          self.buffer = ""
 
+  def _send_message(self, message):
+      if message.strip():
+          payload = {
+              'content': f"```{message}```",
+              'username': 'TwiviaBot',
+              'avatar_url': 'https://i.imgur.com/3qA9RkH.png'
+          }
+          try:
+              requests.post(self.webhook_url, json=payload)
+          except requests.RequestException as e:
+              print(f"Failed to send message to Discord: {e}", file=sys.__stderr__)
+
+  def _send_batches(self):
+      while not self.stop_event.is_set():
+          time.sleep(self.batch_interval)
+          with self.lock:
+              if self.buffer:
+                  self._send_message(self.buffer)
+                  self.buffer = ""
+
+  def close(self):
+      self.stop_event.set()
+      self.thread.join()
+      self.flush()
+
+# Usage
 webhook_url = DISCORD_WEBHOOK_URL
 
 # Set custom streams
 sys.stdout = DiscordWebhookStream(webhook_url)
 sys.stderr = DiscordWebhookStream(webhook_url)
+
+# Ensure streams are closed properly on exit
+import atexit
+atexit.register(sys.stdout.close)
+atexit.register(sys.stderr.close)
 
 
 def get_saved_channels():
@@ -430,29 +467,45 @@ class Bot(commands.Bot):
       if 0 in list(CATEGORIES.keys()):
         if random.randint(1, 100) <= 70:
           selected_category_id = 0
-    
-    #open workbook and select category sheet
-    trivia_workbook = openpyxl.load_workbook(TRIVIA_FILE_NAME)
-    selected_sheet = trivia_workbook[CATEGORIES[selected_category_id]]
+
+    service = build('sheets', 'v4', credentials=credentials)
     
     #select random row(question)
-    random_row = random.randint(2, selected_sheet.max_row)
-    random_row_array = [cell.value for cell in selected_sheet[random_row]]
+    range_name = f"'{CATEGORIES[selected_category_id]}'"
+    result = (
+        service.spreadsheets()
+        .values()
+        .get(spreadsheetId=TRIVIA_SPREADSHEET_ID, range=range_name)
+        .execute()
+    )
+
+    values = result.get('values', [])
+
+    if not values:
+        print('No data found.')
+        return None
+    else:
+        # Find the number of rows
+        num_rows = len(values)
+
+        # Select a random row
+        random_row_index = random.randint(2, num_rows - 1)
+        random_row = values[random_row_index]
+
+        # Move elements to an array
+        row_array = list(random_row)
     
     #Remove None values
-    raw_question_data_array = [x for x in random_row_array if x is not None]
+    raw_question_data_array = [x for x in row_array if x is not None]
     
     #Create an array for answers
-    usable_answers = [raw_question_data_array[3].strip()]
+    usable_answers = [f"{raw_question_data_array[3]}".strip()]
     if len(raw_question_data_array) > 4:
       for i in range(4, len(raw_question_data_array)):
-        usable_answers.append(raw_question_data_array[i].strip())
+        usable_answers.append(f"{raw_question_data_array[i]}".strip())
 
     #Format question for return
     question_data = {'question_id': int(raw_question_data_array[0]), 'category': raw_question_data_array[1].strip(), 'question': raw_question_data_array[2].strip(), 'answer': usable_answers}
-
-    #close workbook
-    trivia_workbook.close()
     
     return question_data
 
@@ -519,6 +572,16 @@ class Bot(commands.Bot):
   async def event_ready(self):
     print(f'Logged in as | {self.nick}')
     print(f'User id is | {self.user_id}')
+    self.update_channels_list()
+
+  async def event_channel_joined(self, channel):
+    self.update_channels_list()
+
+  async def event_channel_left(self, channel):
+    self.update_channels_list()
+
+  def update_channels_list(self):
+    self.channels_list = [channel for channel in self.connected_channels]
 
   async def event_message(self, message):
     #If message is from self, return
@@ -852,7 +915,7 @@ class Bot(commands.Bot):
             matched_category = key
             break  # Exit the loop once a match is found
 
-        if matched_category:
+        if matched_category != None:
           user_categories = get_channel_category_ids(channel_name)
           if user_categories and (matched_category in user_categories):
             remove_channel_category(channel_name, int(matched_category))
@@ -897,15 +960,16 @@ class Bot(commands.Bot):
       "To view a list of commands/functionality, visit: https://www.itssport.co/twiviabot"
     )
 
-
   # %announce
   @commands.command()
   async def announce(self, ctx: commands.Context):
     if ctx.author.name == 'itssport':
-      announcement = ctx.message.content[10:]
-      for channel_name in self.channels:
-        channel = self.get_channel(channel_name)
-        await channel.send(f"[ANNOUNCEMENT] {announcement}")
+      message = ctx.message.content[10:]
+      for channel in self.channels_list:
+        try:
+          await channel.send(f"[ANNOUNCEMENT] {message}")
+        except:
+          print(f"[{channel}] Could not send announcement.")
       await ctx.send("Announcement sent to all channels.")
       print("Announcement sent to all channels.")
     else:

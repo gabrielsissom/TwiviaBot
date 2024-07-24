@@ -29,8 +29,8 @@ A trivia game bot for your Twitch chat. To get started, visit [TwiviaBot's chann
   - 
 
 ## Contribution:
-  - All TwiviaBot Questions are now being hosted online in a [Google Spreadsheet](https://docs.google.com/spreadsheets/d/157Gb7JkwZvq26bz_wJVCn4x3H-iqNZ59/edit?usp=sharing&ouid=111078275511657347073&rtpof=true&sd=true) where users can contribute/comment. 
-  - If you have an issue with a specific question or two, you can open the [Trivia Sheet](https://docs.google.com/spreadsheets/d/157Gb7JkwZvq26bz_wJVCn4x3H-iqNZ59/edit?usp=sharing&ouid=111078275511657347073&rtpof=true&sd=true) and leave a comment on the question. (use ctrl + f to help)
+  - All TwiviaBot Questions are now being hosted online in a [Google Spreadsheet](https://docs.google.com/spreadsheets/d/1PJoXgEcnBGiFa60_I-YvuWdb9PpnXENzsj_WAoSTmNQ/edit?usp=sharing) where users can contribute/comment. 
+  - If you have an issue with a specific question or two, you can open the [Trivia Sheet](https://docs.google.com/spreadsheets/d/1PJoXgEcnBGiFa60_I-YvuWdb9PpnXENzsj_WAoSTmNQ/edit?usp=sharing) and leave a comment on the question. (use ctrl + f to help)
   - If you'd like to contribute to trivia, you can submit your question via [Discord](https://www.discord.gg/hMcbSTFCnU). 
   - If you'd like to contribute a LOT more than just a few questions or help validate question data, you can also inquiry about edit permissions in the [Discord server](https://www.discord.gg/hMcbSTFCnU). 
 
@@ -81,6 +81,6 @@ end of patch notes
 
 ## Resources:
 
-Want to contribute to [TwiviaBot's question database](https://docs.google.com/spreadsheets/d/157Gb7JkwZvq26bz_wJVCn4x3H-iqNZ59/edit?usp=sharing&ouid=111078275511657347073&rtpof=true&sd=true)?
+Want to contribute to [TwiviaBot's question database](https://docs.google.com/spreadsheets/d/1PJoXgEcnBGiFa60_I-YvuWdb9PpnXENzsj_WAoSTmNQ/edit?usp=sharing)?
 
 Bot made using [TwitchIO](https://twitchio.dev/en/latest/index.html).
