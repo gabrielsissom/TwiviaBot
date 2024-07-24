@@ -37,7 +37,8 @@ CATEGORIES = {
   3: "Entertainment",
   4: "Sports & Leisure",
   5: "Music",
-  15: "Genshin Impact"
+  15: "Genshin Impact",
+  16: "Overwatch"
 }
 
 
