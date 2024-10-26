@@ -17,7 +17,6 @@ TRIVIA_SPREADSHEET_ID = "1PJoXgEcnBGiFa60_I-YvuWdb9PpnXENzsj_WAoSTmNQ"
 #GLOBAL CONSTANTS
 DATABASE_URL = os.environ['DATABASE_URL']
 DISCORD_WEBHOOK_URL = os.environ['DISCORD_WEBHOOK_URL']
-TRIVIA_FILE_NAME = 'trivia.xlsx'
 
 #GLOBAL SETTINGS
 HINT_CHARS_REVEALED = 0.4  # Scale between 0.0 and 1.0 where 1 reveals 100% of the answer.
@@ -32,13 +31,19 @@ REVEAL_IN_HINT = ["-", ",", "$", "%", ".", "/", "'", '"', '&', '(', ')']
 
 CATEGORIES = {
   0: "General",
-  1: "Science & Nature",
+  1: "Science",
   2: "Geography",
   3: "Entertainment",
-  4: "Sports & Leisure",
+  4: "Sports",
   5: "Music",
+  6: "History",
+  7: "Food",
+  9: "Games",
+  10: "Theology",
+  12: "ArtLit",
   15: "Genshin Impact",
-  16: "Overwatch"
+  16: "Overwatch",
+  17: "DBD"
 }
 
 
@@ -456,18 +461,8 @@ class Bot(commands.Bot):
     # Select a random category from channel's categories
     if len(categories) > 0:
       selected_category_id = random.choice(categories)
-      #temporary 70% chance of selecting the general category
-      #since this category has 90% of the questions
-      if 0 in categories:
-        if random.randint(1, 100) <= 70:
-          selected_category_id = 0
     else:
       selected_category_id = random.choice(list(CATEGORIES.keys()))
-      #temporary 70% chance of selecting the general category
-      #since this category has 90% of the questions
-      if 0 in list(CATEGORIES.keys()):
-        if random.randint(1, 100) <= 70:
-          selected_category_id = 0
 
     service = build('sheets', 'v4', credentials=credentials)
     
@@ -677,7 +672,7 @@ class Bot(commands.Bot):
         channel_state['current_question']["question"] + f" A: {channel_state['current_question']['answer']}")
 
       await ctx.send(
-        f"[Category - {channel_state['current_question']['category']}] Question: "
+        f"[{channel_state['current_question']['category']}] Question: "
         + channel_state['current_question']["question"])
       await self.check_answer(ctx)
 
@@ -966,11 +961,16 @@ class Bot(commands.Bot):
   async def announce(self, ctx: commands.Context):
     if ctx.author.name == 'itssport':
       message = ctx.message.content[10:]
-      for channel in self.channels_list:
-        try:
-          await channel.send(f"[ANNOUNCEMENT] {message}")
-        except:
-          print(f"[{channel}] Could not send announcement.")
+      print(len(self.connected_channels))
+      for channel in self.connected_channels:
+        if channel != None:
+          try:
+            await channel.send(f"[ANNOUNCEMENT] {message}")
+            print(f"announced in {channel.name}")
+          except:
+            print(f"[{channel.name}] Could not send announcement.")
+        else:
+          print("found none channel")
       await ctx.send("Announcement sent to all channels.")
       print("Announcement sent to all channels.")
     else:
