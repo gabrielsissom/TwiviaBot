@@ -15,3 +15,8 @@ data_transfer.py
 .DS_Store
 number_fixer.py
 credentials.json
+/build/
+/dist/
+icon.ico
+backup.sql
+bot.spec

@@ -1,5 +1,8 @@
-twitchio
-requests
 psycopg2
-discord.py
-openpyxl
+requests
+twitchio==2.6
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+python-dotenv

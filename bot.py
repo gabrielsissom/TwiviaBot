@@ -6,6 +6,35 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from pystray import Icon, MenuItem, Menu
+from PIL import Image
+
+from dotenv import load_dotenv
+
+def on_quit(icon, item):
+    icon.stop()
+
+def setup(icon):
+    icon.visible = True
+
+icon = Icon("TwiviaBot")
+icon.icon = Image.open("icon.ico")  # Load your icon
+icon.menu = Menu(MenuItem("Quit", on_quit))
+
+load_dotenv()
+
+def run_bot():
+    # Create an event loop for this thread
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)  # Set the new loop as the current one
+    main()
+
+def on_quit(icon, item):
+    icon.stop()  # Stop the icon and exit the application
+
+def setup(icon):
+    icon.visible = True  # Make the icon visible in the system tray
+
 #GOOGLE API
 SERVICE_ACCOUNT_FILE = 'credentials.json'
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
@@ -15,8 +44,8 @@ credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCO
 TRIVIA_SPREADSHEET_ID = "1PJoXgEcnBGiFa60_I-YvuWdb9PpnXENzsj_WAoSTmNQ"
 
 #GLOBAL CONSTANTS
-DATABASE_URL = os.environ['DATABASE_URL']
-DISCORD_WEBHOOK_URL = os.environ['DISCORD_WEBHOOK_URL']
+DATABASE_URL = os.getenv('DATABASE_URL')
+DISCORD_WEBHOOK_URL = os.getenv('DISCORD_WEBHOOK_URL')
 
 #GLOBAL SETTINGS
 HINT_CHARS_REVEALED = 0.4  # Scale between 0.0 and 1.0 where 1 reveals 100% of the answer.
@@ -47,8 +76,11 @@ CATEGORIES = {
 }
 
 
+import os
+import psycopg2
+
 def get_db_connection():
-  return psycopg2.connect(DATABASE_URL)
+    return psycopg2.connect(DATABASE_URL)
 
 
 def setup_db():
@@ -423,9 +455,9 @@ def similarity(a, b):
 class Bot(commands.Bot):
 
   def __init__(self, channels):
-    super().__init__(token=os.environ['TMI_TOKEN'],
-                     client_id=os.environ['CLIENT_ID'],
-                     nick=os.environ['BOT_NICK'],
+    super().__init__(token=os.getenv("TMI_TOKEN"),
+                     client_id=os.getenv("TMI_TOKEN"),
+                     nick=os.getenv("BOT_NICK"),
                      prefix=BOT_PREFIX,
                      initial_channels=channels)
 
@@ -978,26 +1010,43 @@ class Bot(commands.Bot):
 
 
 def main():
+    # Initialize DB if not already created
+    setup_db()
 
-  #Initialize DB if not already created
-  setup_db()
-
-  # Load channels into memory
-  channels = get_saved_channels()
-
-  # Ensure TwiviaBot is in the channels
-  if 'twiviabot' not in channels:
-    add_channel('twiviabot')
+    # Load channels into memory
     channels = get_saved_channels()
-    print("[STARTUP] twiviabot not found in channels list on boot, re-added.")
 
-  # Initialize TwiviaBot
-  print("[STARTUP] loading channels...")
-  twiviaBot = Bot(channels)
-  # Run TwiviaBot
-  print("[STARTUP] starting bot...")
-  twiviaBot.run()
+    # Ensure TwiviaBot is in the channels
+    if 'twiviabot' not in channels:
+        add_channel('twiviabot')
+        channels = get_saved_channels()
+        print("[STARTUP] twiviabot not found in channels list on boot, re-added.")
 
+    # Initialize TwiviaBot
+    print("[STARTUP] loading channels...")
+    twiviaBot = Bot(channels)
+
+    # Run TwiviaBot
+    print("[STARTUP] starting bot...")
+    twiviaBot.run()
+
+# Create the system tray icon
+icon = Icon("TwiviaBot")
+icon.icon = Image.open("icon.ico")  # Load your icon
+icon.menu = Menu(MenuItem("Quit", on_quit))  # Add a quit option to the menu
+
+# Run the bot in a separate thread
+
+print("[STARTUP] starting bot thread...")
+bot_thread = threading.Thread(target=run_bot)
+bot_thread.start()
+print("[STARTUP] bot thread started")
+
+# Start the icon and enter the main event loop
+icon.run(setup)
+
+# After the icon is stopped, wait for the bot thread to finish
+bot_thread.join()
 
 if __name__ == "__main__":
   main()
